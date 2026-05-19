@@ -68,7 +68,7 @@ const userInitials = ref('HS') // Mock user: Hari Sputra
       </div>
 
       <!-- Vertical border divider -->
-      <div class="h-6 w-[1px] bg-border"></div>
+      <div class="h-6 w-px bg-border"></div>
 
       <!-- User Profile trigger -->
       <div class="relative">

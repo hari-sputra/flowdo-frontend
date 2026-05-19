@@ -1,83 +1,73 @@
-/* Paper texture overlay removed per user request for a cleaner monochrome style */
-.paper-texture::before {
-  display: none;
-}
-
-.dark .paper-texture::before {
-  display: none;
-}
-
-/* Stacked paper shadow effect */
-.paper-shadow {
-  box-shadow: 
-    0 1px 3px rgba(26, 20, 16, 0.08),
-    0 4px 6px rgba(26, 20, 16, 0.04),
-    2px 6px 0 -2px var(--color-surface),
-    2px 6px 4px -2px rgba(26, 20, 16, 0.06);
-}
-
-.dark .paper-shadow {
-  box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.3),
-    0 4px 6px rgba(0, 0, 0, 0.2),
-    2px 6px 0 -2px var(--color-surface),
-    2px 6px 4px -2px rgba(0, 0, 0, 0.4);
-}
-
-.paper-shadow-lg {
-  box-shadow: 
-    0 4px 6px -1px rgba(26, 20, 16, 0.1),
-    0 2px 4px -1px rgba(26, 20, 16, 0.06),
-    3px 8px 0 -2px var(--color-surface),
-    3px 8px 6px -2px rgba(26, 20, 16, 0.08);
-}
-
-.dark .paper-shadow-lg {
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.4),
-    0 2px 4px -1px rgba(0, 0, 0, 0.3),
-    3px 8px 0 -2px var(--color-surface),
-    3px 8px 6px -2px rgba(0, 0, 0, 0.5);
-}
-
-/* Notebook ruled lines */
-.ruled-line {
-  background-image: repeating-linear-gradient(
-    transparent, transparent 31px, var(--color-border) 31px, var(--color-border) 32px
-  );
-  background-position: 0 1.2rem;
-}
-
-/* Ink Stamp (for priority badges) */
-.ink-stamp {
-  position: relative;
-  display: inline-block;
-  padding: 0.125rem 0.375rem;
-  border: 2px solid currentColor;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.85;
-  transform: rotate(-3deg);
-}
-
-.ink-stamp::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-.dark .ink-stamp::after {
-  mix-blend-mode: multiply;
-  opacity: 0.3;
-}
-
-/* Paper UI element borders */
-.paper-border {
+/* Modern elevated cards matching Figma design */
+.card-elevated {
+  background-color: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -2px rgba(95, 51, 225, 0.04), 0 2px 6px -1px rgba(95, 51, 225, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-elevated:hover {
+  box-shadow: 0 10px 25px -5px rgba(95, 51, 225, 0.08), 0 4px 10px -2px rgba(95, 51, 225, 0.04);
+}
+
+.dark .card-elevated {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card-elevated:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 10px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Category indicator pill badges (Figma Style) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.status-badge-todo {
+  background-color: var(--color-category-orange);
+  color: #D43E00;
+}
+
+.status-badge-inprogress {
+  background-color: var(--color-category-purple);
+  color: var(--color-accent);
+}
+
+.status-badge-done {
+  background-color: var(--color-category-blue);
+  color: #005DC2;
+}
+
+.status-badge-urgent {
+  background-color: var(--color-category-pink);
+  color: #C2006B;
+}
+
+.dark .status-badge-todo {
+  background-color: rgba(255, 125, 83, 0.15);
+  color: #FF9F7D;
+}
+
+.dark .status-badge-inprogress {
+  background-color: rgba(135, 100, 255, 0.15);
+  color: #A38CFF;
+}
+
+.dark .status-badge-done {
+  background-color: rgba(37, 85, 255, 0.15);
+  color: #7DA6FF;
+}
+
+.dark .status-badge-urgent {
+  background-color: rgba(244, 120, 184, 0.15);
+  color: #FF9FDF;
 }

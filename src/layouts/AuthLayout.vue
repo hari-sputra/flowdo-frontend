@@ -6,18 +6,19 @@ const { isDark, setTheme } = useTheme()
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-surface transition-colors duration-300 px-4 py-8 relative overflow-hidden">
-    <!-- Decorative background elements -->
-    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent via-transparent to-transparent"></div>
+  <div class="min-h-screen flex items-center justify-center bg-surface transition-colors duration-300 px-4 py-8 relative overflow-hidden font-body">
+    <!-- Figma styling purple gradient and blurred background ellipses -->
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-accent/10 blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-accent/15 blur-[120px] pointer-events-none"></div>
 
     <!-- Main Auth Card Container -->
-    <div class="w-full max-w-[420px] bg-surface-elevated shadow-md border border-border rounded-lg p-8 sm:p-10 relative z-10 transition-colors duration-300">
+    <div class="w-full max-w-[420px] bg-surface-elevated shadow-lg border border-border rounded-2xl p-8 sm:p-10 relative z-10 transition-colors duration-300">
       
       <!-- Top Theme Toggle (Handcrafted Minimal Accent Button) -->
       <div class="absolute top-4 right-4 flex items-center gap-2 z-20">
         <button
           @click="setTheme(isDark ? 'light' : 'dark')"
-          class="p-2 text-text-secondary hover:text-text-primary rounded-full border border-transparent hover:border-border transition-all duration-200"
+          class="p-2 text-text-secondary hover:text-text-primary rounded-full hover:bg-border/20 transition-all duration-200"
           aria-label="Toggle theme"
         >
           <!-- Sun Icon (Light mode) -->
@@ -37,8 +38,8 @@ const { isDark, setTheme } = useTheme()
         <h1 class="font-heading text-4xl font-extrabold text-accent mb-2 tracking-tight">
           FlowDo
         </h1>
-        <p class="font-body text-sm text-text-secondary">
-          Tasks in a digital notebook
+        <p class="font-body text-xs text-text-secondary tracking-wide uppercase font-semibold">
+          Simple, elegant task management
         </p>
       </div>
 
@@ -51,3 +52,4 @@ const { isDark, setTheme } = useTheme()
     </div>
   </div>
 </template>
+

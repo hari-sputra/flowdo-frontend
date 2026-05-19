@@ -38,7 +38,7 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <aside class="flex flex-col h-screen select-none select-none relative transition-colors duration-300">
+  <aside class="flex flex-col h-screen select-none relative transition-colors duration-300">
     <!-- Left Leather Binding Accent (Notebook Spine) -->
     <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent/80 dark:bg-accent/60"></div>
     
@@ -89,7 +89,7 @@ const handleLogout = () => {
     </nav>
 
     <!-- Divider Line -->
-    <div class="h-[1px] bg-border mx-4"></div>
+    <div class="h-px bg-border mx-4"></div>
 
     <!-- Bottom Actions Area -->
     <div class="p-4 space-y-1 pl-5">
@@ -98,7 +98,7 @@ const handleLogout = () => {
         to="/settings"
         class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 group"
         :class="[
-          settingsActive.value
+          settingsActive
             ? 'text-accent bg-accent/5 dark:bg-accent/10 border-l-2 border-accent pl-2.5 font-semibold'
             : 'text-text-secondary hover:text-text-primary hover:bg-border/30 dark:hover:bg-border/10 pl-3'
         ]"

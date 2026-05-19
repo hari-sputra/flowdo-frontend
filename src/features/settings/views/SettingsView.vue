@@ -7,19 +7,19 @@ const { override: platformOverride, setOverride } = useDeviceDetection()
 
 const themes: { label: string; value: ThemePreference; desc: string }[] = [
   {
-    label: 'Clean Monochrome Book',
+    label: 'Figma Light Mode',
     value: 'light',
-    desc: 'Crisp white paper aesthetic with high-contrast grayscale ink typography.'
+    desc: 'Crisp purple accent branding with a clean, flat light violet background.'
   },
   {
-    label: 'Dark Leather Journal',
+    label: 'Modern Slate Dark',
     value: 'dark',
-    desc: 'Luxurious dark brown bound cover style with gold-foil text accents.'
+    desc: 'Deep modern slate colors combined with vibrant violet accents for low-light comfort.'
   },
   {
-    label: 'Book Companion (System)',
+    label: 'System Matcher',
     value: 'system',
-    desc: 'Synthesize surface style matches system setting automatically.'
+    desc: 'Automatically adjusts between Light and Dark mode based on OS settings.'
   }
 ]
 
@@ -30,38 +30,38 @@ const platforms: { label: string; value: Platform | null; desc: string }[] = [
     desc: 'Evaluate device categories reactively using touch + viewport queries.'
   },
   {
-    label: 'Force Smartphone Layout',
+    label: 'Force Mobile Layout',
     value: 'mobile',
-    desc: 'Simulate the pocket-notebook layout styled for hand-held scrolling.'
+    desc: 'Simulate smartphone UI with user profile headers and bottom nav bar.'
   },
   {
     label: 'Force Tablet Layout',
     value: 'tablet',
-    desc: 'Simulate collapsible TOC navigation index.'
+    desc: 'Simulate collapsible sidebar layout matching Figma tablet screens.'
   },
   {
     label: 'Force Desktop Layout',
     value: 'desktop',
-    desc: 'Expand index spine spreads to desktop widescreen view.'
+    desc: 'Render widescreen viewports utilizing the same collapsible tablet sidebar.'
   }
 ]
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="space-y-8 font-body pb-10">
     <div class="border-b border-border pb-4">
-      <h1 class="font-heading text-3xl font-extrabold text-text-primary tracking-tight">
-        Journal Preferences
+      <h1 class="font-heading text-2xl font-bold text-text-primary">
+        App Preferences
       </h1>
-      <p class="font-mono text-xs text-text-secondary mt-1">
-        Personalize style and behavior layouts
+      <p class="text-xs text-text-secondary">
+        Personalize visual styling and override responsive layout parameters
       </p>
     </div>
 
     <!-- Theme Settings Card -->
-    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 transition-colors duration-300">
-      <h2 class="font-heading text-lg font-bold text-text-primary mb-4 border-b border-border pb-2">
-        Ink & Cover Theme
+    <div class="card-elevated p-6">
+      <h2 class="font-heading text-base font-bold text-text-primary mb-4 border-b border-border/50 pb-2">
+        Branding Cover Theme
       </h2>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -69,25 +69,25 @@ const platforms: { label: string; value: Platform | null; desc: string }[] = [
           v-for="theme in themes"
           :key="theme.value"
           @click="setTheme(theme.value)"
-          class="flex flex-col text-left p-4 rounded border transition-all duration-200 cursor-pointer select-none"
+          class="flex flex-col text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer select-none"
           :class="[
             themePref === theme.value
               ? 'border-accent bg-accent/5 dark:bg-accent/10 ring-1 ring-accent'
               : 'border-border hover:border-text-secondary/50 bg-transparent'
           ]"
         >
-          <span class="font-heading font-semibold text-sm text-text-primary mb-1">{{ theme.label }}</span>
-          <span class="font-body text-xs text-text-secondary leading-relaxed">{{ theme.desc }}</span>
+          <span class="font-semibold text-sm text-text-primary mb-1">{{ theme.label }}</span>
+          <span class="text-xs text-text-secondary leading-relaxed">{{ theme.desc }}</span>
         </button>
       </div>
     </div>
 
     <!-- Adaptive Layout Override Card (Extremely powerful debug/useability tool!) -->
-    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 transition-colors duration-300">
-      <h2 class="font-heading text-lg font-bold text-text-primary mb-2 border-b border-border pb-2">
+    <div class="card-elevated p-6">
+      <h2 class="font-heading text-base font-bold text-text-primary mb-2 border-b border-border/50 pb-2">
         Platform Overrides
       </h2>
-      <p class="font-body text-xs text-text-secondary mb-4 leading-relaxed">
+      <p class="text-xs text-text-secondary mb-4 leading-relaxed">
         Force layout formats to verify how the application adapts interfaces. Great for testing smartphone bottom-bars, tablet indices, or full desktop spreads.
       </p>
 
@@ -96,17 +96,18 @@ const platforms: { label: string; value: Platform | null; desc: string }[] = [
           v-for="platform in platforms"
           :key="platform.label"
           @click="setOverride(platform.value)"
-          class="flex flex-col text-left p-4 rounded border transition-all duration-200 cursor-pointer select-none"
+          class="flex flex-col text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer select-none"
           :class="[
             platformOverride === platform.value
               ? 'border-accent bg-accent/5 dark:bg-accent/10 ring-1 ring-accent'
               : 'border-border hover:border-text-secondary/50 bg-transparent'
           ]"
         >
-          <span class="font-heading font-semibold text-sm text-text-primary mb-1">{{ platform.label }}</span>
-          <span class="font-body text-xs text-text-secondary leading-relaxed">{{ platform.desc }}</span>
+          <span class="font-semibold text-sm text-text-primary mb-1">{{ platform.label }}</span>
+          <span class="text-xs text-text-secondary leading-relaxed">{{ platform.desc }}</span>
         </button>
       </div>
     </div>
   </div>
 </template>
+

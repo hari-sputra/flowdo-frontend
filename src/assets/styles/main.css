@@ -4,36 +4,44 @@
 
 @theme {
   /* Fonts */
-  --font-heading: "Playfair Display", Georgia, serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Lexend Deca", "Poppins", sans-serif;
+  --font-body: "Lexend Deca", "Poppins", sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
-  /* Colors - Light Mode (Monochrome Book) */
-  --color-surface: #f9f9f9;
-  --color-surface-elevated: #ffffff;
-  --color-border: #e5e5e5;
-  --color-text-primary: #111111;
-  --color-text-secondary: #666666;
-  --color-accent: #000000; /* black ink */
-  --color-danger: #dc2626;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
+  /* Colors - Light Mode (Figma Task App Style) */
+  --color-surface: #F5F7FB;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #EAEAEF;
+  --color-text-primary: #24252C;
+  --color-text-secondary: #6E6A7C;
+  --color-accent: #5F33E1; /* Figma primary violet */
+  --color-danger: #FF7D53;
+  --color-success: #7FFCAA;
+  --color-warning: #FFD12E;
+
+  /* Custom Category & Tag Accent Palette */
+  --color-category-blue: #E7F3FF;
+  --color-category-pink: #FFE4F2;
+  --color-category-purple: #EDE4FF;
+  --color-category-orange: #FFE6D4;
+  --color-category-yellow: #FFF6D4;
 
   /* Default shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
 .dark {
-  /* Colors - Dark Mode (Journal) */
-  --color-surface: #1a1612;
-  --color-surface-elevated: #2a2420;
-  --color-border: #3d352e;
-  --color-text-primary: #e8e0d4;
-  --color-text-secondary: #9a8b7a;
-  --color-accent: #c9a96e; /* gold foil */
-  --color-danger: #d4604e;
-  --color-success: #6b8f65;
-  --color-warning: #c9a43e;
+  /* Colors - Dark Mode (Modern Slate Journal) */
+  --color-surface: #131418;
+  --color-surface-elevated: #1E1F25;
+  --color-border: #2E2F37;
+  --color-text-primary: #F5F3FF;
+  --color-text-secondary: #9E9CAB;
+  --color-accent: #8764FF; /* Lighter violet for readability on dark */
+  --color-danger: #FF7D53;
+  --color-success: #7FFCAA;
+  --color-warning: #FFD12E;
 }
+

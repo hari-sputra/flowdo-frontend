@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.store'
 
 const props = defineProps<{
   collapsed: boolean
@@ -12,41 +13,41 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const navItems = [
   {
+    label: 'Home',
+    icon: 'home',
+    path: '/dashboard',
+    isActive: computed(() => route.path === '/dashboard')
+  },
+  {
     label: 'Tasks',
     icon: 'list',
-    path: '/dashboard',
-    isActive: computed(() => route.path === '/dashboard' && !route.query.filter)
+    path: '/tasks/today',
+    isActive: computed(() => route.path === '/tasks/today')
   },
   {
-    label: 'Due Today',
-    icon: 'calendar',
-    path: '/dashboard',
-    query: { filter: 'today' },
-    isActive: computed(() => route.path === '/dashboard' && route.query.filter === 'today')
-  },
-  {
-    label: 'Tags',
-    icon: 'tag',
-    path: '/dashboard',
-    query: { filter: 'tags' },
-    isActive: computed(() => route.path === '/dashboard' && route.query.filter === 'tags')
+    label: 'Add Task',
+    icon: 'plus',
+    path: '/tasks/new',
+    isActive: computed(() => route.path === '/tasks/new')
   }
 ]
 
 const settingsActive = computed(() => route.path === '/settings')
 
 const handleLogout = () => {
+  authStore.logout()
   router.push('/login')
 }
 </script>
 
 <template>
-  <aside class="flex flex-col h-screen select-none relative transition-all duration-300">
-    <!-- Collapsible spine-line accent on left -->
-    <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent/60"></div>
+  <aside class="flex flex-col h-screen select-none relative transition-colors duration-300">
+    <!-- Collapsible accent indicator on left -->
+    <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>
 
     <!-- Header / Toggle Section -->
     <div class="h-16 flex items-center justify-between px-4 border-b border-border pl-5">
@@ -80,7 +81,7 @@ const handleLogout = () => {
       <RouterLink
         v-for="item in navItems"
         :key="item.label"
-        :to="{ path: item.path, query: item.query }"
+        :to="item.path"
         class="flex items-center gap-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200"
         :class="[
           item.isActive.value
@@ -89,7 +90,14 @@ const handleLogout = () => {
         ]"
       >
         <span class="w-5 h-5 shrink-0 flex items-center justify-center">
-          <svg v-if="item.icon === 'list'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+          <!-- Home Icon -->
+          <svg v-if="item.icon === 'home'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+
+          <!-- List Icon -->
+          <svg v-else-if="item.icon === 'list'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
             <line x1="8" y1="6" x2="21" y2="6" />
             <line x1="8" y1="12" x2="21" y2="12" />
             <line x1="8" y1="18" x2="21" y2="18" />
@@ -97,21 +105,16 @@ const handleLogout = () => {
             <line x1="3" y1="12" x2="3.01" y2="12" />
             <line x1="3" y1="18" x2="3.01" y2="18" />
           </svg>
-          <svg v-else-if="item.icon === 'calendar'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
-          </svg>
-          <svg v-else-if="item.icon === 'tag'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-            <line x1="7" y1="7" x2="7.01" y2="7" />
+
+          <!-- Plus Icon -->
+          <svg v-else-if="item.icon === 'plus'" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </span>
         <span
           v-if="!props.collapsed"
-          class="font-heading tracking-wide transition-opacity duration-200"
+          class="font-body tracking-wide transition-opacity duration-200"
         >
           {{ item.label }}
         </span>
@@ -119,7 +122,7 @@ const handleLogout = () => {
     </nav>
 
     <!-- Divider Line -->
-    <div class="h-[1px] bg-border mx-3"></div>
+    <div class="h-px bg-border mx-3"></div>
 
     <!-- Bottom Actions Area -->
     <div class="p-3 space-y-2 pl-4 pb-6">
@@ -128,7 +131,7 @@ const handleLogout = () => {
         to="/settings"
         class="flex items-center gap-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200"
         :class="[
-          settingsActive.value
+          settingsActive
             ? 'text-accent bg-accent/5 dark:bg-accent/10 border-l-2 border-accent font-semibold pl-2'
             : 'text-text-secondary hover:text-text-primary hover:bg-border/20 dark:hover:bg-border/5 pl-2.5'
         ]"
@@ -141,7 +144,7 @@ const handleLogout = () => {
         </span>
         <span
           v-if="!props.collapsed"
-          class="font-heading tracking-wide transition-opacity duration-200"
+          class="font-body tracking-wide transition-opacity duration-200"
         >
           Settings
         </span>
@@ -160,7 +163,7 @@ const handleLogout = () => {
         </span>
         <span
           v-if="!props.collapsed"
-          class="font-heading tracking-wide transition-opacity duration-200"
+          class="font-body tracking-wide transition-opacity duration-200"
         >
           Logout
         </span>
@@ -168,3 +171,4 @@ const handleLogout = () => {
     </div>
   </aside>
 </template>
+

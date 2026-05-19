@@ -46,6 +46,16 @@ const router = createRouter({
           component: () => import('@/features/tasks/views/TaskDashboard.vue')
         },
         {
+          path: 'tasks/today',
+          name: 'today-tasks',
+          component: () => import('@/features/tasks/views/TodayTasksView.vue')
+        },
+        {
+          path: 'tasks/new',
+          name: 'add-task',
+          component: () => import('@/features/tasks/views/AddTaskView.vue')
+        },
+        {
           path: 'settings',
           name: 'settings',
           component: () => import('@/features/settings/views/SettingsView.vue')
