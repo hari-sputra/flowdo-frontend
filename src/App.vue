@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <!-- Global transitions can be added here later -->
+  <!-- Main entry point: Layout structures are resolved inside routing views -->
   <RouterView v-slot="{ Component }">
     <transition name="page-fade" mode="out-in">
       <component :is="Component" />
