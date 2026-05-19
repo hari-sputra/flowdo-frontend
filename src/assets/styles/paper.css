@@ -1,0 +1,92 @@
+/* Paper texture overlay via pseudo-element to avoid breaking layout */
+.paper-texture::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-blend-mode: multiply;
+  mix-blend-mode: multiply;
+}
+
+.dark .paper-texture::before {
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+}
+
+/* Stacked paper shadow effect */
+.paper-shadow {
+  box-shadow: 
+    0 1px 3px rgba(26, 20, 16, 0.08),
+    0 4px 6px rgba(26, 20, 16, 0.04),
+    2px 6px 0 -2px var(--color-surface),
+    2px 6px 4px -2px rgba(26, 20, 16, 0.06);
+}
+
+.dark .paper-shadow {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 4px 6px rgba(0, 0, 0, 0.2),
+    2px 6px 0 -2px var(--color-surface),
+    2px 6px 4px -2px rgba(0, 0, 0, 0.4);
+}
+
+.paper-shadow-lg {
+  box-shadow: 
+    0 4px 6px -1px rgba(26, 20, 16, 0.1),
+    0 2px 4px -1px rgba(26, 20, 16, 0.06),
+    3px 8px 0 -2px var(--color-surface),
+    3px 8px 6px -2px rgba(26, 20, 16, 0.08);
+}
+
+.dark .paper-shadow-lg {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3),
+    3px 8px 0 -2px var(--color-surface),
+    3px 8px 6px -2px rgba(0, 0, 0, 0.5);
+}
+
+/* Notebook ruled lines */
+.ruled-line {
+  background-image: repeating-linear-gradient(
+    transparent, transparent 31px, var(--color-border) 31px, var(--color-border) 32px
+  );
+  background-position: 0 1.2rem;
+}
+
+/* Ink Stamp (for priority badges) */
+.ink-stamp {
+  position: relative;
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+  transform: rotate(-3deg);
+}
+
+.ink-stamp::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.dark .ink-stamp::after {
+  mix-blend-mode: multiply;
+  opacity: 0.3;
+}
+
+/* Paper UI element borders */
+.paper-border {
+  border: 1px solid var(--color-border);
+}

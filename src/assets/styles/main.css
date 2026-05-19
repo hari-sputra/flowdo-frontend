@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "./paper.css";
+@import "./transitions.css";
+
+@theme {
+  /* Fonts */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* Colors - Light Mode (Paper) */
+  --color-surface: #faf8f5;
+  --color-surface-elevated: #ffffff;
+  --color-border: #e8e0d4;
+  --color-text-primary: #1a1410;
+  --color-text-secondary: #6b5e52;
+  --color-accent: #8b4513; /* sepia ink */
+  --color-danger: #a02c2c;
+  --color-success: #2d5a27;
+  --color-warning: #8b6914;
+
+  /* Default shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(26 20 16 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(26 20 16 / 0.1), 0 1px 2px -1px rgb(26 20 16 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(26 20 16 / 0.1), 0 2px 4px -2px rgb(26 20 16 / 0.1);
+}
+
+.dark {
+  /* Colors - Dark Mode (Journal) */
+  --color-surface: #1a1612;
+  --color-surface-elevated: #2a2420;
+  --color-border: #3d352e;
+  --color-text-primary: #e8e0d4;
+  --color-text-secondary: #9a8b7a;
+  --color-accent: #c9a96e; /* gold foil */
+  --color-danger: #d4604e;
+  --color-success: #6b8f65;
+  --color-warning: #c9a43e;
+}
