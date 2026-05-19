@@ -59,7 +59,7 @@ const platforms: { label: string; value: Platform | null; desc: string }[] = [
     </div>
 
     <!-- Theme Settings Card -->
-    <div class="bg-surface-elevated paper-shadow paper-border rounded-lg p-6 transition-colors duration-300">
+    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 transition-colors duration-300">
       <h2 class="font-heading text-lg font-bold text-text-primary mb-4 border-b border-border pb-2">
         Ink & Cover Theme
       </h2>
@@ -83,7 +83,7 @@ const platforms: { label: string; value: Platform | null; desc: string }[] = [
     </div>
 
     <!-- Adaptive Layout Override Card (Extremely powerful debug/useability tool!) -->
-    <div class="bg-surface-elevated paper-shadow paper-border rounded-lg p-6 transition-colors duration-300">
+    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 transition-colors duration-300">
       <h2 class="font-heading text-lg font-bold text-text-primary mb-2 border-b border-border pb-2">
         Platform Overrides
       </h2>

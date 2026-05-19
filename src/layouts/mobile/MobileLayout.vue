@@ -10,7 +10,7 @@ import MobileBottomNav from './MobileBottomNav.vue'
     <MobileHeader class="h-14 shrink-0 border-b border-border bg-surface-elevated z-20" />
 
     <!-- Scrollable Main Page Spread -->
-    <main class="flex-1 overflow-y-auto p-4 pb-20 paper-texture select-text">
+    <main class="flex-1 overflow-y-auto p-4 pb-20 bg-surface select-text">
       <slot />
     </main>
 

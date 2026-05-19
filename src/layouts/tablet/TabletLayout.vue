@@ -32,7 +32,7 @@ const isCollapsed = ref(true) // Collapsed (icon-only) by default per user reque
       </header>
 
       <!-- Scrollable Main Content -->
-      <main class="flex-1 overflow-y-auto p-6 paper-texture">
+      <main class="flex-1 overflow-y-auto p-6 bg-surface">
         <slot />
       </main>
     </div>

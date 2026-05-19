@@ -6,12 +6,12 @@ const { isDark, setTheme } = useTheme()
 </script>
 
 <template>
-  <div class="paper-texture min-h-screen flex items-center justify-center bg-surface transition-colors duration-300 px-4 py-8 relative overflow-hidden">
+  <div class="min-h-screen flex items-center justify-center bg-surface transition-colors duration-300 px-4 py-8 relative overflow-hidden">
     <!-- Decorative background elements -->
     <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent via-transparent to-transparent"></div>
 
     <!-- Main Auth Card Container -->
-    <div class="w-full max-w-[420px] bg-surface-elevated paper-shadow paper-border rounded-lg p-8 sm:p-10 relative z-10 transition-colors duration-300">
+    <div class="w-full max-w-[420px] bg-surface-elevated shadow-md border border-border rounded-lg p-8 sm:p-10 relative z-10 transition-colors duration-300">
       
       <!-- Top Theme Toggle (Handcrafted Minimal Accent Button) -->
       <div class="absolute top-4 right-4 flex items-center gap-2 z-20">

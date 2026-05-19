@@ -20,15 +20,15 @@ const { platform } = useDeviceDetection()
           </p>
         </div>
         
-        <!-- Ink stamp priority placeholder -->
-        <span class="inline-block border-2 border-dashed border-accent/60 text-accent font-heading text-xs font-bold uppercase tracking-widest px-3 py-1 rounded rotate-[-2deg] opacity-75">
-          Ink & Parchment
+        <!-- Clean priority tag placeholder -->
+        <span class="inline-block bg-accent text-white font-mono text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm">
+          High Priority
         </span>
       </div>
     </div>
 
     <!-- Active Layout Metaphor Status Info Box (Wow-factor indicator) -->
-    <div class="bg-surface-elevated paper-shadow paper-border rounded-lg p-6 relative overflow-hidden transition-colors duration-300">
+    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 relative overflow-hidden transition-colors duration-300">
       <div class="absolute right-0 top-0 bottom-0 w-2 bg-accent opacity-30"></div>
       
       <h3 class="font-heading text-lg font-bold text-text-primary mb-2">
@@ -48,13 +48,13 @@ const { platform } = useDeviceDetection()
       </div>
     </div>
 
-    <!-- Notebook Ruled lines task list placeholder -->
-    <div class="bg-surface-elevated paper-shadow paper-border rounded-lg p-6 transition-colors duration-300">
+    <!-- Clean Task List Mockup -->
+    <div class="bg-surface-elevated shadow-sm border border-border rounded-lg p-6 transition-colors duration-300">
       <h3 class="font-heading text-lg font-bold text-text-primary mb-4 border-b border-border pb-2">
-        Ruled Notebook Entries (Mock Up)
+        Task Entries (Mock Up)
       </h3>
       
-      <div class="ruled-line divide-y divide-border/20 space-y-4 pt-2">
+      <div class="divide-y divide-border/20 space-y-4 pt-2">
         <div class="flex items-start gap-4 pb-4">
           <input type="checkbox" class="mt-1 accent-accent" checked />
           <div class="space-y-1">

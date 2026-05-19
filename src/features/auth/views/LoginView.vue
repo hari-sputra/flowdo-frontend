@@ -21,7 +21,7 @@ const handleLogin = () => {
         Sign In
       </h2>
       <p class="font-mono text-xs text-text-secondary mt-1">
-        Retrieve your records
+        Welcome back
       </p>
     </div>
 
@@ -62,7 +62,7 @@ const handleLogin = () => {
           type="submit"
           class="w-full bg-accent hover:bg-accent/90 text-surface font-heading py-2.5 px-4 rounded border border-accent hover:border-accent/90 shadow-sm transition-all duration-200 cursor-pointer text-center text-sm font-semibold tracking-wide"
         >
-          Open Notebook
+          Sign In
         </button>
       </div>
     </form>
