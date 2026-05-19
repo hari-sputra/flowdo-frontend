@@ -8,21 +8,21 @@
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
-  /* Colors - Light Mode (Paper) */
-  --color-surface: #faf8f5;
+  /* Colors - Light Mode (Monochrome Book) */
+  --color-surface: #f9f9f9;
   --color-surface-elevated: #ffffff;
-  --color-border: #e8e0d4;
-  --color-text-primary: #1a1410;
-  --color-text-secondary: #6b5e52;
-  --color-accent: #8b4513; /* sepia ink */
-  --color-danger: #a02c2c;
-  --color-success: #2d5a27;
-  --color-warning: #8b6914;
+  --color-border: #e5e5e5;
+  --color-text-primary: #111111;
+  --color-text-secondary: #666666;
+  --color-accent: #000000; /* black ink */
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
 
   /* Default shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(26 20 16 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(26 20 16 / 0.1), 0 1px 2px -1px rgb(26 20 16 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(26 20 16 / 0.1), 0 2px 4px -2px rgb(26 20 16 / 0.1);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .dark {

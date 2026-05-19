@@ -7,9 +7,9 @@ const { override: platformOverride, setOverride } = useDeviceDetection()
 
 const themes: { label: string; value: ThemePreference; desc: string }[] = [
   {
-    label: 'Warm Cream Paper',
+    label: 'Clean Monochrome Book',
     value: 'light',
-    desc: 'Traditional physical notebook aesthetic with ink typography.'
+    desc: 'Crisp white paper aesthetic with high-contrast grayscale ink typography.'
   },
   {
     label: 'Dark Leather Journal',
