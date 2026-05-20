@@ -5,13 +5,23 @@ import { useAuthStore } from '@/stores/auth.store'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
 const email = ref('')
 const password = ref('')
+const errors = ref<Record<string, string>>({})
 
 const handleLogin = () => {
-  if (email.value && password.value) {
-    authStore.login(email.value)
+  errors.value = {}
+  
+  const result = authStore.login({
+    email: email.value,
+    password: password.value
+  })
+  
+  if (result.success) {
     router.push('/dashboard')
+  } else if (result.errors) {
+    errors.value = result.errors
   }
 }
 </script>
@@ -27,10 +37,10 @@ const handleLogin = () => {
       </p>
     </div>
 
-    <form @submit.prevent="handleLogin" class="space-y-5">
+    <form @submit.prevent="handleLogin" class="space-y-5" novalidate>
       <!-- Email Input -->
       <div class="space-y-1.5">
-        <label for="email" class="text-xs font-semibold text-text-secondary">
+        <label for="email" class="text-xs font-semibold" :class="errors.email ? 'text-danger' : 'text-text-secondary'">
           Email Address
         </label>
         <input
@@ -39,13 +49,15 @@ const handleLogin = () => {
           type="email"
           required
           placeholder="name@example.com"
-          class="w-full bg-surface-elevated border border-border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all duration-200"
+          class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
+          :class="errors.email ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
+        <p v-if="errors.email" class="text-[10px] font-medium text-danger mt-1">{{ errors.email }}</p>
       </div>
 
       <!-- Password Input -->
       <div class="space-y-1.5">
-        <label for="password" class="text-xs font-semibold text-text-secondary">
+        <label for="password" class="text-xs font-semibold" :class="errors.password ? 'text-danger' : 'text-text-secondary'">
           Password
         </label>
         <input
@@ -54,8 +66,10 @@ const handleLogin = () => {
           type="password"
           required
           placeholder="••••••••"
-          class="w-full bg-surface-elevated border border-border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all duration-200"
+          class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
+          :class="errors.password ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
+        <p v-if="errors.password" class="text-[10px] font-medium text-danger mt-1">{{ errors.password }}</p>
       </div>
 
       <!-- Submit button -->

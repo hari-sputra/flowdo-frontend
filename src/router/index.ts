@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import AdaptiveRoot from '@/layouts/AdaptiveRoot.vue'
+import { useAuthStore } from '@/stores/auth.store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,6 +14,7 @@ const router = createRouter({
     {
       path: '/auth',
       component: AuthLayout,
+      meta: { requiresGuest: true },
       children: [
         {
           path: 'login',
@@ -39,6 +41,7 @@ const router = createRouter({
     {
       path: '/',
       component: AdaptiveRoot,
+      meta: { requiresAuth: true },
       children: [
         {
           path: 'dashboard',
@@ -56,6 +59,11 @@ const router = createRouter({
           component: () => import('@/features/tasks/views/AddTaskView.vue')
         },
         {
+          path: 'tasks/:id/edit',
+          name: 'edit-task',
+          component: () => import('@/features/tasks/views/EditTaskView.vue')
+        },
+        {
           path: 'settings',
           name: 'settings',
           component: () => import('@/features/settings/views/SettingsView.vue')
@@ -68,6 +76,19 @@ const router = createRouter({
       redirect: '/dashboard'
     }
   ]
+})
+
+// Navigation Guards
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/auth/login')
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next('/dashboard')
+  } else {
+    next()
+  }
 })
 
 export default router

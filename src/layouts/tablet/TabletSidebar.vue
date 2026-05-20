@@ -120,55 +120,6 @@ const handleLogout = () => {
         </span>
       </RouterLink>
     </nav>
-
-    <!-- Divider Line -->
-    <div class="h-px bg-border mx-3"></div>
-
-    <!-- Bottom Actions Area -->
-    <div class="p-3 space-y-2 pl-4 pb-6">
-      <!-- Settings link -->
-      <RouterLink
-        to="/settings"
-        class="flex items-center gap-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200"
-        :class="[
-          settingsActive
-            ? 'text-accent bg-accent/5 dark:bg-accent/10 border-l-2 border-accent font-semibold pl-2'
-            : 'text-text-secondary hover:text-text-primary hover:bg-border/20 dark:hover:bg-border/5 pl-2.5'
-        ]"
-      >
-        <span class="w-5 h-5 shrink-0 flex items-center justify-center">
-          <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </span>
-        <span
-          v-if="!props.collapsed"
-          class="font-body tracking-wide transition-opacity duration-200"
-        >
-          Settings
-        </span>
-      </RouterLink>
-
-      <!-- Logout action -->
-      <button
-        @click="handleLogout"
-        class="w-full flex items-center gap-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 text-danger hover:bg-danger/5 dark:hover:bg-danger/10 text-left"
-        :class="[props.collapsed ? 'pl-2.5' : 'pl-2.5']"
-      >
-        <span class="w-5 h-5 shrink-0 flex items-center justify-center">
-          <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-          </svg>
-        </span>
-        <span
-          v-if="!props.collapsed"
-          class="font-body tracking-wide transition-opacity duration-200"
-        >
-          Logout
-        </span>
-      </button>
-    </div>
   </aside>
 </template>
 

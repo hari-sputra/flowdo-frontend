@@ -1,23 +1,31 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useTheme } from '@/composables/useTheme'
+import { useAuthStore } from '@/stores/auth.store'
+import { useTaskStore } from '@/stores/task.store'
 
 const route = useRoute()
+const router = useRouter()
 const { isDark, setTheme } = useTheme()
+const authStore = useAuthStore()
+const taskStore = useTaskStore()
 
 // Page title resolver
 const pageTitle = computed(() => {
   if (route.path === '/settings') return 'Settings'
-  if (route.query.filter === 'today') return 'Due Today'
-  if (route.query.filter === 'tags') return 'Tag Management'
+  if (route.path === '/tags') return 'Tag Management'
+  if (route.path === '/tasks/today' || route.query.filter === 'today') return 'Due Today'
   return 'My Workspace'
 })
 
-// Mock states (to be backed by Pinia store in Phase 3/5)
-const dueTodayCount = ref(3) // Mock notification badge count
 const userDropdownOpen = ref(false)
-const userInitials = ref('HS') // Mock user: Hari Sputra
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/auth/login')
+  userDropdownOpen.value = false
+}
 </script>
 
 <template>
@@ -59,10 +67,10 @@ const userInitials = ref('HS') // Mock user: Hari Sputra
           
           <!-- Due Today red notification dot count -->
           <span
-            v-if="dueTodayCount > 0"
+            v-if="taskStore.dueTodayCount > 0"
             class="absolute top-1.5 right-1.5 w-4 h-4 bg-danger text-[10px] text-white rounded-full flex items-center justify-center font-mono font-bold scale-90"
           >
-            {{ dueTodayCount }}
+            {{ taskStore.dueTodayCount }}
           </span>
         </button>
       </div>
@@ -77,33 +85,43 @@ const userInitials = ref('HS') // Mock user: Hari Sputra
           class="flex items-center gap-2 group p-1 pr-2 rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors"
         >
           <span class="w-8 h-8 rounded-full bg-accent/10 dark:bg-accent/20 border border-border text-accent flex items-center justify-center font-mono font-bold text-sm">
-            {{ userInitials }}
+            {{ authStore.userInitials }}
           </span>
           <span class="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors hidden sm:inline">
-            Hari Sputra
+            {{ authStore.currentUser?.name || 'Guest' }}
           </span>
           <svg class="w-4 h-4 text-text-secondary transition-transform duration-200" :class="{ 'rotate-180': userDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
 
-        <!-- Mock Dropdown Menu -->
+        <!-- Dropdown Menu -->
         <div
           v-if="userDropdownOpen"
           v-on-click-outside="() => userDropdownOpen = false"
           class="absolute right-0 mt-2 w-48 bg-surface-elevated paper-border paper-shadow rounded-md py-1 z-30 transition-all text-sm"
         >
-          <div class="px-4 py-2 border-b border-border text-xs text-text-secondary font-mono">
-            Signed in as <br>
-            <span class="font-body text-text-primary text-sm break-all font-semibold">hari@example.com</span>
-          </div>
           <RouterLink
             to="/settings"
             @click="userDropdownOpen = false"
-            class="block px-4 py-2 text-text-primary hover:bg-border/30 dark:hover:bg-border/10 transition-colors font-medium"
+            class="flex items-center gap-3 px-4 py-2.5 text-text-primary hover:bg-border/30 dark:hover:bg-border/10 transition-colors font-medium"
           >
-            My Settings
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            Settings
           </RouterLink>
+          
+          <button
+            @click="handleLogout"
+            class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-danger hover:bg-danger/5 dark:hover:bg-danger/10 transition-colors font-medium border-t border-border/50"
+          >
+            <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            Logout
+          </button>
         </div>
       </div>
       

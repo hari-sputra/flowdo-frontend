@@ -9,7 +9,7 @@ const { platform } = useDeviceDetection()
 const layoutMap = {
   mobile: MobileLayout,
   tablet: TabletLayout,
-  desktop: TabletLayout, // Use the collapsible tablet layout for desktop as requested
+  desktop: DesktopLayout,
 } as const
 </script>
 

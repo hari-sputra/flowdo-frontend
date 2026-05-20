@@ -4,7 +4,7 @@ import DesktopTopbar from './DesktopTopbar.vue'
 </script>
 
 <template>
-  <div class="min-h-screen flex bg-surface text-text-primary transition-colors duration-300 relative">
+  <div class="h-screen overflow-hidden flex bg-surface text-text-primary transition-colors duration-300 relative">
     
     <!-- Desktop Sidebar (Book Spine/Index) -->
     <DesktopSidebar class="w-[240px] shrink-0 border-r border-border bg-surface-elevated z-20" />

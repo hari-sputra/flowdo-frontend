@@ -1,13 +1,8 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
-
-export interface User {
-  id: string
-  name: string
-  email: string
-  avatarUrl?: string
-}
+import type { User, LoginPayload, RegisterPayload } from '@/types/auth.types'
+import { validateEmail, validatePassword, validateRequired } from '@/utils/validation.utils'
 
 export const useAuthStore = defineStore('auth', () => {
   const currentUser = useLocalStorage<User | null>('flowdo_user', {
@@ -18,12 +13,49 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => currentUser.value !== null)
 
-  const login = (email: string) => {
+  const login = (payload: LoginPayload) => {
+    const errors: Record<string, string> = {}
+    
+    const emailErr = validateEmail(payload.email)
+    if (emailErr) errors.email = emailErr
+    
+    const passErr = validatePassword(payload.password)
+    if (passErr) errors.password = passErr
+    
+    if (Object.keys(errors).length > 0) {
+      return { success: false, errors }
+    }
+    
     currentUser.value = {
       id: 'user-1',
       name: 'Hari Saputra',
-      email: email
+      email: payload.email
     }
+    return { success: true }
+  }
+
+  const register = (payload: RegisterPayload) => {
+    const errors: Record<string, string> = {}
+    
+    const nameErr = validateRequired(payload.name, 'Name')
+    if (nameErr) errors.name = nameErr
+    
+    const emailErr = validateEmail(payload.email)
+    if (emailErr) errors.email = emailErr
+    
+    const passErr = validatePassword(payload.password)
+    if (passErr) errors.password = passErr
+    
+    if (Object.keys(errors).length > 0) {
+      return { success: false, errors }
+    }
+    
+    currentUser.value = {
+      id: 'user-2',
+      name: payload.name,
+      email: payload.email
+    }
+    return { success: true }
   }
 
   const logout = () => {
@@ -43,6 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     currentUser,
     isAuthenticated,
     login,
+    register,
     logout,
     userInitials
   }

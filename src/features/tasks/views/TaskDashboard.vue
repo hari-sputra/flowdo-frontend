@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useTaskStore } from '@/stores/task.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
+import TaskCard from '../components/shared/TaskCard.vue'
+import TaskSortControls from '../components/shared/TaskSortControls.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 
 const taskStore = useTaskStore()
 const authStore = useAuthStore()
@@ -11,9 +14,13 @@ const router = useRouter()
 
 const todayStr = dayjs().format('dddd, D MMMM')
 
+onMounted(() => {
+  taskStore.showDueTodayToast()
+})
+
 // Active tasks that are "In Progress" for the horizontal scroll section
 const inProgressTasks = computed(() => {
-  return taskStore.tasks.filter(t => t.status === 'in-progress')
+  return taskStore.sortedTasks.filter(t => t.status === 'in-progress')
 })
 
 // Tasks filtered list (by default all, but can search/filter)
@@ -21,7 +28,7 @@ const searchQuery = ref('')
 const selectedPriority = ref<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all')
 
 const filteredTasks = computed(() => {
-  return taskStore.tasks.filter(t => {
+  return taskStore.sortedTasks.filter(t => {
     const matchesSearch = t.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                          (t.description || '').toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesPriority = selectedPriority.value === 'all' || t.priority === selectedPriority.value
@@ -40,6 +47,23 @@ const getPriorityColorClass = (priority: string) => {
 
 const toggleTask = (id: string) => {
   taskStore.toggleTaskStatus(id)
+}
+
+// Delete Confirmation
+const showDeleteConfirm = ref(false)
+const taskToDelete = ref<string | null>(null)
+
+const confirmDelete = (id: string) => {
+  taskToDelete.value = id
+  showDeleteConfirm.value = true
+}
+
+const executeDelete = () => {
+  if (taskToDelete.value) {
+    taskStore.deleteTask(taskToDelete.value)
+  }
+  showDeleteConfirm.value = false
+  taskToDelete.value = null
 }
 </script>
 
@@ -104,6 +128,7 @@ const toggleTask = (id: string) => {
           v-for="task in inProgressTasks" 
           :key="task.id"
           class="shrink-0 w-64 card-elevated p-5 snap-start relative flex flex-col justify-between h-36"
+          @click="router.push(`/tasks/${task.id}/edit`)"
         >
           <div>
             <div class="flex items-center justify-between mb-2">
@@ -114,7 +139,7 @@ const toggleTask = (id: string) => {
                 {{ dayjs(task.dueDate).format('D MMM') }}
               </span>
             </div>
-            <h4 class="text-sm font-bold text-text-primary line-clamp-2 leading-snug">
+            <h4 class="text-sm font-bold text-text-primary line-clamp-2 leading-snug cursor-pointer hover:text-accent">
               {{ task.title }}
             </h4>
           </div>
@@ -125,7 +150,7 @@ const toggleTask = (id: string) => {
               {{ task.priority }}
             </span>
             <button 
-              @click="toggleTask(task.id)"
+              @click.stop="toggleTask(task.id)"
               class="w-6 h-6 rounded-full border-2 border-accent flex items-center justify-center text-accent hover:bg-accent/5 transition-colors"
             >
               <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-3" viewBox="0 0 24 24">
@@ -214,13 +239,13 @@ const toggleTask = (id: string) => {
 
     <!-- 4. Dynamic Tasks List showing filtered selections -->
     <div class="space-y-4 pt-2">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between flex-wrap gap-4">
         <h3 class="text-sm font-bold text-text-primary">
           {{ selectedPriority !== 'all' ? `${selectedPriority} Priority` : 'All' }} Task Entries
         </h3>
         
         <!-- Search bar input -->
-        <div class="relative w-44">
+        <div class="relative w-full sm:w-44">
           <input 
             v-model="searchQuery"
             type="text" 
@@ -234,52 +259,19 @@ const toggleTask = (id: string) => {
         </div>
       </div>
 
+      <TaskSortControls 
+        :sortState="taskStore.sortState" 
+        @toggle-sort="taskStore.toggleSort" 
+      />
+
       <!-- Task items list -->
       <div class="space-y-3" v-if="filteredTasks.length > 0">
-        <div 
-          v-for="task in filteredTasks"
-          :key="task.id"
-          class="card-elevated p-4 flex items-start justify-between gap-3 hover:-translate-y-px transition-transform duration-200"
-        >
-          <div class="flex items-start gap-3">
-            <button 
-              @click="toggleTask(task.id)"
-              class="w-5 h-5 rounded border-2 border-border mt-0.5 flex items-center justify-center transition-colors"
-              :class="[task.status === 'done' ? 'bg-success/20 border-success text-success' : 'hover:border-accent']"
-            >
-              <svg v-if="task.status === 'done'" class="w-3.5 h-3.5 fill-none stroke-current stroke-3" viewBox="0 0 24 24">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </button>
-            <div class="space-y-1">
-              <h4 
-                class="text-sm font-bold text-text-primary"
-                :class="[task.status === 'done' ? 'line-through text-text-secondary opacity-60' : '']"
-              >
-                {{ task.title }}
-              </h4>
-              <p class="text-xs text-text-secondary line-clamp-1" v-if="task.description">
-                {{ task.description }}
-              </p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-text-secondary font-medium">
-                  Due {{ dayjs(task.dueDate).format('D MMM YYYY') }}
-                </span>
-                <span class="w-1 h-1 rounded-full bg-border"></span>
-                <span class="text-[10px] font-semibold uppercase" :class="task.priority === 'urgent' ? 'text-danger' : 'text-accent'">
-                  {{ task.priority }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <span class="status-badge" :class="[
-            task.status === 'done' ? 'status-badge-done' : 
-            task.status === 'in-progress' ? 'status-badge-inprogress' : 'status-badge-todo'
-          ]">
-            {{ task.status }}
-          </span>
-        </div>
+        <TaskCard 
+          v-for="task in filteredTasks" 
+          :key="task.id" 
+          :task="task" 
+          @delete="confirmDelete"
+        />
       </div>
       
       <!-- Empty state -->
@@ -292,6 +284,13 @@ const toggleTask = (id: string) => {
       </div>
     </div>
 
+    <ConfirmDialog
+      :open="showDeleteConfirm"
+      title="Delete Task"
+      message="Are you sure you want to delete this task? This action cannot be undone."
+      @confirm="executeDelete"
+      @cancel="showDeleteConfirm = false"
+    />
   </div>
 </template>
 

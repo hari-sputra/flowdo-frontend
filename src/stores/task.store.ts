@@ -2,16 +2,10 @@ import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import dayjs from 'dayjs'
-
-export interface Task {
-  id: string
-  title: string
-  description?: string
-  status: 'to-do' | 'in-progress' | 'done'
-  dueDate: string // YYYY-MM-DD
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  tags: string[]
-}
+import type { Task } from '@/types/task.types'
+import type { Tag } from '@/types/tag.types'
+import { useTaskSorting } from '@/composables/useTaskSorting'
+import { useDueDateAlert } from '@/composables/useDueDateAlert'
 
 export const useTaskStore = defineStore('tasks', () => {
   const todayStr = dayjs().format('YYYY-MM-DD')
@@ -57,7 +51,19 @@ export const useTaskStore = defineStore('tasks', () => {
     }
   ])
 
-  // Actions
+  // Tags State
+  const tags = useLocalStorage<Tag[]>('flowdo_tags', [
+    { id: 'tag-1', name: 'Work', color: '#8764FF', isDefault: true },
+    { id: 'tag-2', name: 'Personal', color: '#FF7D53', isDefault: true },
+    { id: 'tag-3', name: 'Study', color: '#2555FF', isDefault: true },
+    { id: 'tag-4', name: 'Fitness', color: '#F478B8', isDefault: true }
+  ])
+
+  // Use Composables for Sorting and Alerts
+  const { sortState, sortedTasks, toggleSort } = useTaskSorting(tasks)
+  const { dueTodayTasks, overdueTasks, showDueTodayToast, isOverdue, isDueToday } = useDueDateAlert(tasks)
+
+  // Task Actions
   const addTask = (task: Omit<Task, 'id'>) => {
     const id = `task-${Math.random().toString(36).substring(2, 9)}`
     tasks.value.push({ ...task, id })
@@ -88,24 +94,40 @@ export const useTaskStore = defineStore('tasks', () => {
     }
   }
 
+  // Tag Actions
+  const addTag = (tag: Omit<Tag, 'id'>) => {
+    const id = `tag-${Math.random().toString(36).substring(2, 9)}`
+    tags.value.push({ ...tag, id, isDefault: false })
+    return id
+  }
+
+  const deleteTag = (id: string) => {
+    const tag = tags.value.find(t => t.id === id)
+    if (tag && !tag.isDefault) {
+      tags.value = tags.value.filter(t => t.id !== id)
+      // Optional: remove this tag from all tasks
+      tasks.value.forEach(t => {
+        t.tags = t.tags.filter(tagName => tagName !== tag.name)
+      })
+    }
+  }
+
   // Helper selectors and progress computations
   const getTasksByDate = (dateStr: string) => {
-    return tasks.value.filter(t => t.dueDate === dateStr)
+    return sortedTasks.value.filter(t => t.dueDate === dateStr)
   }
 
-  // Get tasks by filter query
   const getTasksByFilter = (filterType: string) => {
     if (filterType === 'todo') {
-      return tasks.value.filter(t => t.status === 'to-do')
+      return sortedTasks.value.filter(t => t.status === 'to-do')
     } else if (filterType === 'inprogress') {
-      return tasks.value.filter(t => t.status === 'in-progress')
+      return sortedTasks.value.filter(t => t.status === 'in-progress')
     } else if (filterType === 'completed') {
-      return tasks.value.filter(t => t.status === 'done')
+      return sortedTasks.value.filter(t => t.status === 'done')
     }
-    return tasks.value
+    return sortedTasks.value
   }
 
-  // Compute stats for a specific priority
   const getPriorityStats = (priority: 'low' | 'medium' | 'high' | 'urgent') => {
     const priorityTasks = tasks.value.filter(t => t.priority === priority)
     const total = priorityTasks.length
@@ -115,7 +137,6 @@ export const useTaskStore = defineStore('tasks', () => {
     return { total, completed, progress }
   }
 
-  // Total daily completion statistics
   const dailyProgress = computed(() => {
     const todayTasks = getTasksByDate(todayStr)
     const total = todayTasks.length
@@ -124,21 +145,31 @@ export const useTaskStore = defineStore('tasks', () => {
     return Math.round((completed / total) * 100)
   })
 
-  // Due today count (not done yet)
   const dueTodayCount = computed(() => {
-    return tasks.value.filter(t => t.dueDate === todayStr && t.status !== 'done').length
+    return dueTodayTasks.value.length
   })
 
   return {
     tasks,
+    tags,
+    sortState,
+    sortedTasks,
+    overdueTasks,
+    dueTodayTasks,
+    dueTodayCount,
+    dailyProgress,
     addTask,
     updateTask,
     deleteTask,
     toggleTaskStatus,
+    toggleSort,
+    addTag,
+    deleteTag,
     getTasksByDate,
     getTasksByFilter,
     getPriorityStats,
-    dailyProgress,
-    dueTodayCount
+    showDueTodayToast,
+    isOverdue,
+    isDueToday
   }
 })

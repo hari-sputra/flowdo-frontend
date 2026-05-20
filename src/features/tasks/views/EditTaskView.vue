@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useTaskStore } from '@/stores/task.store'
 import dayjs from 'dayjs'
 import TagManagerModal from '../components/shared/TagManagerModal.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 
 const taskStore = useTaskStore()
 const router = useRouter()
+const route = useRoute()
 
 const title = ref('')
 const description = ref('')
@@ -14,6 +16,23 @@ const dueDate = ref(dayjs().format('YYYY-MM-DD'))
 const priority = ref<'low' | 'medium' | 'high' | 'urgent'>('medium')
 const selectedTags = ref<string[]>([])
 const showTagModal = ref(false)
+
+const showDeleteConfirm = ref(false)
+const taskId = route.params.id as string
+
+onMounted(() => {
+  const task = taskStore.tasks.find(t => t.id === taskId)
+  if (task) {
+    title.value = task.title
+    description.value = task.description || ''
+    dueDate.value = task.dueDate
+    priority.value = task.priority
+    selectedTags.value = [...task.tags]
+  } else {
+    // redirect if not found
+    router.replace('/tasks/today')
+  }
+})
 
 const selectPriority = (p: 'low' | 'medium' | 'high' | 'urgent') => {
   priority.value = p
@@ -27,20 +46,24 @@ const toggleTag = (tagName: string) => {
   }
 }
 
-const handleAddTask = () => {
+const handleUpdateTask = () => {
   if (!title.value.trim()) return
   
-  taskStore.addTask({
+  taskStore.updateTask(taskId, {
     title: title.value,
     description: description.value,
-    status: 'to-do',
     dueDate: dueDate.value,
     priority: priority.value,
-    tags: selectedTags.value.length > 0 ? selectedTags.value : ['Work'] // Default tag if empty
+    tags: selectedTags.value.length > 0 ? selectedTags.value : ['Work']
   })
   
-  // Route back to today tasks view
-  router.push('/tasks/today')
+  router.back()
+}
+
+const executeDelete = () => {
+  taskStore.deleteTask(taskId)
+  showDeleteConfirm.value = false
+  router.back()
 }
 </script>
 
@@ -50,16 +73,23 @@ const handleAddTask = () => {
     <div class="border-b border-border pb-4 flex justify-between items-start">
       <div>
         <h1 class="text-xl font-bold text-text-primary">
-          Create New Task
+          Edit Task
         </h1>
         <p class="text-xs text-text-secondary">
-          Add details to organize your schedule
+          Update the details of your task
         </p>
       </div>
+      <button 
+        type="button" 
+        @click="showDeleteConfirm = true"
+        class="text-xs font-semibold text-danger bg-danger/10 px-3 py-1.5 rounded-lg hover:bg-danger/20 transition-colors"
+      >
+        Delete
+      </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleAddTask" class="space-y-5">
+    <form @submit.prevent="handleUpdateTask" class="space-y-5">
       <!-- Title -->
       <div class="space-y-1.5">
         <label for="title" class="text-xs font-bold text-text-primary uppercase tracking-wider">
@@ -177,11 +207,18 @@ const handleAddTask = () => {
           type="submit"
           class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm"
         >
-          Create Task
+          Save Changes
         </button>
       </div>
     </form>
 
     <TagManagerModal :open="showTagModal" @close="showTagModal = false" />
+    <ConfirmDialog
+      :open="showDeleteConfirm"
+      title="Delete Task"
+      message="Are you sure you want to delete this task? This action cannot be undone."
+      @confirm="executeDelete"
+      @cancel="showDeleteConfirm = false"
+    />
   </div>
 </template>

@@ -8,7 +8,7 @@ const taskStore = useTaskStore()
 </script>
 
 <template>
-  <div class="min-h-screen flex bg-surface text-text-primary transition-colors duration-300 relative">
+  <div class="h-screen overflow-hidden flex bg-surface text-text-primary transition-colors duration-300 relative">
     
     <!-- Collapsible Tablet Sidebar -->
     <TabletSidebar

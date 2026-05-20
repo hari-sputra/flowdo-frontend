@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { Toaster } from 'vue-sonner'
+import { useTheme } from '@/composables/useTheme'
+
+const { isDark } = useTheme()
 </script>
 
 <template>
@@ -9,4 +13,6 @@ import { RouterView } from 'vue-router'
       <component :is="Component" />
     </transition>
   </RouterView>
+  
+  <Toaster position="top-right" :theme="isDark ? 'dark' : 'light'" />
 </template>
