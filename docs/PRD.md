@@ -12,18 +12,20 @@
 
 ### Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Frontend Framework | Vue.js (Composition API + `<script setup>`) | 3.x |
-| CSS Framework | Tailwind CSS | v4 |
-| State Management | Pinia | Latest |
-| Router | Vue Router | Latest |
-| HTTP Client | Axios | Latest |
-| Backend Framework | Laravel | 13.x |
-| Authentication | Laravel Sanctum (SPA cookie-based) | Latest |
-| Database | PostgreSQL | 16+ |
-| Containerization | Docker + Docker Compose | Production only |
-| Build Tool | Vite | Latest |
+> **Note on Development Phase:** The frontend application currently runs on a client-side mock architecture using VueUse `useLocalStorage` for user state and task persistence. Backend specifications (Sanctum, Laravel, PostgreSQL, Docker) are documented here as integration targets for the upcoming production phase.
+
+| Layer | Technology | Version | Status |
+|-------|-----------|---------|--------|
+| Frontend Framework | Vue.js (Composition API + `<script setup>`) | 3.x | Integrated |
+| CSS Framework | Tailwind CSS | v4 | Integrated (using `@tailwindcss/vite`) |
+| State Management | Pinia | Latest | Integrated (Mocked via Local Storage) |
+| Router | Vue Router | Latest | Integrated |
+| HTTP Client | Axios | Latest | Prepared |
+| Backend Framework | Laravel | 13.x | Integration target |
+| Authentication | Laravel Sanctum (SPA cookie-based) | Latest | Integration target |
+| Database | PostgreSQL | 16+ | Integration target |
+| Containerization | Docker + Docker Compose | Production only | Production setup |
+| Build Tool | Vite | Latest | Integrated |
 
 ---
 
@@ -124,21 +126,7 @@
 │                    └─────┬─────┘                         │
 └──────────────────────────┼───────────────────────────────┘
                            │ HTTP (Sanctum Cookie)
-┌──────────────────────────┼───────────────────────────────┐
-│                    ┌─────┴─────┐        Production       │
-│                    │  Nginx    │        (Docker)          │
-│                    └─────┬─────┘                         │
-│                    ┌─────┴─────┐                         │
-│                    │  Laravel  │                          │
-│                    │   API     │                          │
-│                    └─────┬─────┘                         │
-│                    ┌─────┴─────┐                         │
-│                    │ PostgreSQL│                          │
-│                    └───────────┘                         │
-└──────────────────────────────────────────────────────────┘
-```
-
-### 3.2 Frontend Architecture (Vue.js 3)
+┌──────────────────────────┼───────────────�### 3.2 Frontend Architecture (Vue.js 3)
 
 ```
 flowdo-frontend/
@@ -146,33 +134,78 @@ flowdo-frontend/
 ├── src/
 │   ├── main.ts
 │   ├── App.vue
+│   ├── env.d.ts
 │   ├── assets/
 │   │   └── styles/
-│   │       └── main.css              # Tailwind entry
+│   │       ├── main.css              # Tailwind CSS v4 entry
+│   │       ├── paper.css             # Elevated cards & status badges styling
+│   │       └── transitions.css       # Page/Modal animations
 │   ├── router/
-│   │   └── index.ts                  # Vue Router config
-│   ├── stores/                       # Pinia stores
+│   │   └── index.ts                  # Vue Router config (nested /auth, dashboard, settings)
+│   ├── stores/                       # Pinia stores (Mocked with local storage persistence)
+│   │   ├── __tests__/                # Stores unit tests
+│   │   │   ├── auth.store.spec.ts
+│   │   │   └── task.store.spec.ts
 │   │   ├── auth.store.ts
 │   │   └── task.store.ts
-│   ├── composables/                  # Shared logic
+│   ├── composables/                  # Shared reactive logic
+│   │   ├── __tests__/                # Composables unit tests
+│   │   │   ├── useDeviceDetection.spec.ts
+│   │   │   └── useTheme.spec.ts
 │   │   ├── useDeviceDetection.ts
 │   │   ├── useDueDateAlert.ts
-│   │   └── useTaskSorting.ts
-│   ├── services/                     # API layer
-│   │   ├── api.client.ts             # Axios instance
-│   │   ├── auth.service.ts
-│   │   └── task.service.ts
+│   │   ├── useTaskSorting.ts
+│   │   └── useTheme.ts
 │   ├── types/                        # TypeScript interfaces
-│   │   ├── task.types.ts
-│   │   └── auth.types.ts
+│   │   ├── auth.types.ts
+│   │   ├── tag.types.ts
+│   │   └── task.types.ts
 │   ├── layouts/                      # Adaptive layouts
-│   │   ├── AdaptiveRoot.vue          # Platform switcher
+│   │   ├── AdaptiveRoot.vue          # Platform switcher component
+│   │   ├── AuthLayout.vue            # Centered paper card layout for auth
 │   │   ├── mobile/
-│   │   │   ├── MobileLayout.vue
-│   │   │   ├── MobileNavbar.vue
-│   │   │   └── MobileBottomNav.vue
+│   │   │   ├── MobileBottomNav.vue
+│   │   │   ├── MobileHeader.vue
+│   │   │   └── MobileLayout.vue
 │   │   ├── tablet/
 │   │   │   ├── TabletLayout.vue
+│   │   │   └── TabletSidebar.vue
+│   │   └── desktop/
+│   │       ├── DesktopLayout.vue
+│   │       ├── DesktopSidebar.vue
+│   │       └── DesktopTopbar.vue
+│   ├── features/                     # Feature modules
+│   │   ├── auth/
+│   │   │   └── views/
+│   │   │       ├── LoginView.vue
+│   │   │       └── RegisterView.vue
+│   │   ├── settings/
+│   │   │   └── views/
+│   │   │       └── SettingsView.vue  # App theme & platform overrides controller
+│   │   └── tasks/
+│   │       ├── views/
+│   │       │   ├── AddTaskView.vue
+│   │       │   ├── EditTaskView.vue
+│   │       │   ├── TaskDashboard.vue
+│   │       │   └── TodayTasksView.vue
+│   │       └── components/
+│   │           └── shared/           # Shared components between platforms
+│   │               ├── ConfirmDialog.vue
+│   │               ├── DueTodayBanner.vue
+│   │               ├── TagManagerModal.vue
+│   │               ├── TaskCard.vue
+│   │               ├── TaskPriorityBadge.vue
+│   │               └── TaskSortControls.vue
+│   └── utils/                        # Validation & Date utilities
+│       ├── date.utils.ts
+│       └── validation.utils.ts
+├── index.html
+├── vite.config.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── package.json
+```yout.vue
 │   │   │   └── TabletSidebar.vue
 │   │   └── desktop/
 │   │       ├── DesktopLayout.vue
@@ -467,36 +500,60 @@ const layoutMap = {
 
 ```typescript
 // types/task.types.ts
-export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
-export type TaskSortField = 'due_date' | 'title' | 'priority';
-export type SortDirection = 'asc' | 'desc';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+export type TaskStatus = 'to-do' | 'in-progress' | 'done'
+export type TaskSortField = 'dueDate' | 'title' | 'priority'
+export type SortDirection = 'asc' | 'desc'
 
 export interface Task {
-  id: number;
-  title: string;
-  description: string | null;
-  due_date: string;           // ISO date string
-  priority: TaskPriority;
-  is_completed: boolean;
-  completed_at: string | null;
-  created_at: string;
-  updated_at: string;
+  id: string
+  title: string
+  description?: string
+  status: TaskStatus
+  dueDate: string
+  priority: TaskPriority
+  tags: string[]
 }
 
 export interface TaskCreatePayload {
-  title: string;
-  description?: string;
-  due_date: string;
-  priority: TaskPriority;
-}
-
-export interface TaskUpdatePayload extends Partial<TaskCreatePayload> {
-  is_completed?: boolean;
+  title: string
+  description?: string
+  dueDate: string
+  priority: TaskPriority
+  status: TaskStatus
+  tags: string[]
 }
 
 export interface TaskSortState {
-  field: TaskSortField;
-  direction: SortDirection;
+  field: TaskSortField
+  direction: SortDirection
+}
+
+// types/tag.types.ts
+export interface Tag {
+  id: string
+  name: string
+  color: string
+  isDefault?: boolean
+}
+
+// types/auth.types.ts
+export interface User {
+  id: string
+  name: string
+  email: string
+  avatarUrl?: string
+}
+
+export interface LoginPayload {
+  email: string
+  password: string
+}
+
+export interface RegisterPayload {
+  name: string
+  email: string
+  password: string
 }
 ```
 
@@ -504,28 +561,51 @@ export interface TaskSortState {
 
 ```typescript
 // stores/task.store.ts
-export const useTaskStore = defineStore('task', () => {
-  const tasks = ref<Task[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-  const sort = ref<TaskSortState>({ field: 'due_date', direction: 'asc' });
-  const filter = ref<'all' | 'active' | 'completed'>('all');
+export const useTaskStore = defineStore('tasks', () => {
+  const tasks = useLocalStorage<Task[]>('flowdo_tasks', [...])
+  const tags = useLocalStorage<Tag[]>('flowdo_tags', [...])
 
-  const filteredTasks = computed(() => { /* filter logic */ });
-  const sortedTasks = computed(() => { /* sort logic */ });
-  const dueTodayTasks = computed(() => { /* due date check */ });
-  const dueTodayCount = computed(() => dueTodayTasks.value.length);
+  const { sortState, sortedTasks, toggleSort } = useTaskSorting(tasks)
+  const { dueTodayTasks, overdueTasks, showDueTodayToast, isOverdue, isDueToday } = useDueDateAlert(tasks)
 
-  async function fetchTasks() { /* API call */ }
-  async function createTask(payload: TaskCreatePayload) { /* API call */ }
-  async function updateTask(id: number, payload: TaskUpdatePayload) { /* API call */ }
-  async function deleteTask(id: number) { /* API call */ }
-  async function toggleCompletion(id: number) { /* API call */ }
+  const addTask = (task: Omit<Task, 'id'>) => { ... }
+  const updateTask = (id: string, updates: Partial<Task>) => { ... }
+  const deleteTask = (id: string) => { ... }
+  const toggleTaskStatus = (id: string) => { ... }
+  
+  const addTag = (tag: Omit<Tag, 'id'>) => { ... }
+  const deleteTag = (id: string) => { ... }
 
-  return { tasks, loading, error, sort, filter, filteredTasks, sortedTasks,
-           dueTodayTasks, dueTodayCount, fetchTasks, createTask, updateTask,
-           deleteTask, toggleCompletion };
-});
+  const getTasksByDate = (dateStr: string) => { ... }
+  const getTasksByFilter = (filterType: string) => { ... }
+  const getPriorityStats = (priority: 'low' | 'medium' | 'high' | 'urgent') => { ... }
+  const dailyProgress = computed(() => { ... })
+  const dueTodayCount = computed(() => dueTodayTasks.value.length)
+
+  return {
+    tasks,
+    tags,
+    sortState,
+    sortedTasks,
+    overdueTasks,
+    dueTodayTasks,
+    dueTodayCount,
+    dailyProgress,
+    addTask,
+    updateTask,
+    deleteTask,
+    toggleTaskStatus,
+    toggleSort,
+    addTag,
+    deleteTag,
+    getTasksByDate,
+    getTasksByFilter,
+    getPriorityStats,
+    showDueTodayToast,
+    isOverdue,
+    isDueToday
+  }
+})
 ```
 
 ### 7.3 Laravel TaskPolicy (Authorization)
@@ -893,22 +973,49 @@ export function useTheme() {
 ```css
 /* main.css */
 @import "tailwindcss";
+@import "./paper.css";
+@import "./transitions.css";
 
 @theme {
-  --color-surface: #ffffff;
-  --color-surface-elevated: #f8fafc;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-accent: #6366f1;
-  --color-danger: #ef4444;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
+  /* Fonts */
+  --font-heading: "Lexend Deca", "Poppins", sans-serif;
+  --font-body: "Lexend Deca", "Poppins", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* Colors - Light Mode (Figma Task App Style) */
+  --color-surface: #F5F7FB;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #EAEAEF;
+  --color-text-primary: #24252C;
+  --color-text-secondary: #6E6A7C;
+  --color-accent: #5F33E1; /* Figma primary violet */
+  --color-danger: #FF7D53;
+  --color-success: #7FFCAA;
+  --color-warning: #FFD12E;
+
+  /* Custom Category & Tag Accent Palette */
+  --color-category-blue: #E7F3FF;
+  --color-category-pink: #FFE4F2;
+  --color-category-purple: #EDE4FF;
+  --color-category-orange: #FFE6D4;
+  --color-category-yellow: #FFF6D4;
+
+  /* Default shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
 .dark {
-  --color-surface: #0f172a;
-  --color-surface-elevated: #1e293b;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
+  /* Colors - Dark Mode (Modern Slate Journal) */
+  --color-surface: #131418;
+  --color-surface-elevated: #1E1F25;
+  --color-border: #2E2F37;
+  --color-text-primary: #F5F3FF;
+  --color-text-secondary: #9E9CAB;
+  --color-accent: #8764FF; /* Lighter violet for readability on dark */
+  --color-danger: #FF7D53;
+  --color-success: #7FFCAA;
+  --color-warning: #FFD12E;
 }
 ```

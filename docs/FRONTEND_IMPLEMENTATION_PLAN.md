@@ -1,6 +1,6 @@
 # Phase 2 — Layouts & Adaptive Shell
 
-> **Parent:** [Frontend Implementation Plan](file:///home/day/Documents/personal/flowdo-frontend/docs/FRONTEND_IMPLEMENTATION_PLAN.md)  
+> **Parent:** [Frontend Implementation Plan](FRONTEND_IMPLEMENTATION_PLAN.md)  
 > **PRD Ref:** §6 Adaptive Design Strategy, §15 Dark Mode  
 > **Status:** ✅ Approved
 
@@ -8,7 +8,7 @@
 
 ## 1. Design Concept — Three Adaptive Layouts
 
-![Adaptive Layout Concept](/home/day/.gemini/antigravity/brain/3abb48e8-a45a-46b3-9bf9-fa50047911e6/adaptive_layouts_concept.png)
+*(Adaptive Layout Concept)*
 
 The three layouts are designed as **distinct reading experiences** of the same notebook, not mere responsive reflows:
 
@@ -280,25 +280,32 @@ const routes = [
     redirect: '/dashboard'
   },
   {
-    path: '/login',
-    component: () => import('@/layouts/AuthLayout.vue'),
+    path: '/auth',
+    component: AuthLayout,
+    meta: { requiresGuest: true },
     children: [
-      { path: '', name: 'login', component: () => import('@/features/auth/views/LoginView.vue') }
+      { path: 'login', name: 'login', component: () => import('@/features/auth/views/LoginView.vue') },
+      { path: 'register', name: 'register', component: () => import('@/features/auth/views/RegisterView.vue') }
     ]
+  },
+  {
+    path: '/login',
+    redirect: '/auth/login'
   },
   {
     path: '/register',
-    component: () => import('@/layouts/AuthLayout.vue'),
-    children: [
-      { path: '', name: 'register', component: () => import('@/features/auth/views/RegisterView.vue') }
-    ]
+    redirect: '/auth/register'
   },
   {
     path: '/',
-    component: () => import('@/layouts/AdaptiveRoot.vue'),
+    component: AdaptiveRoot,
+    meta: { requiresAuth: true },
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('@/features/tasks/views/TaskDashboard.vue') },
-      { path: 'settings', name: 'settings', component: () => import('@/features/settings/views/SettingsView.vue') },
+      { path: 'tasks/today', name: 'today-tasks', component: () => import('@/features/tasks/views/TodayTasksView.vue') },
+      { path: 'tasks/new', name: 'add-task', component: () => import('@/features/tasks/views/AddTaskView.vue') },
+      { path: 'tasks/:id/edit', name: 'edit-task', component: () => import('@/features/tasks/views/EditTaskView.vue') },
+      { path: 'settings', name: 'settings', component: () => import('@/features/settings/views/SettingsView.vue') }
     ]
   }
 ]

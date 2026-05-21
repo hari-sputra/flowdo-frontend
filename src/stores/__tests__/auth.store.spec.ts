@@ -63,7 +63,7 @@ describe('Auth Store', () => {
     expect(store.isAuthenticated).toBe(false)
     expect(store.userInitials).toBe('?')
 
-    store.login('newuser@example.com')
+    store.login({ email: 'newuser@example.com', password: 'password123' })
     expect(store.currentUser?.email).toBe('newuser@example.com')
     expect(store.currentUser?.name).toBe('Hari Saputra')
     expect(store.isAuthenticated).toBe(true)
