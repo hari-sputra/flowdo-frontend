@@ -1,3 +1,5 @@
+import type { Tag } from './tag.types'
+
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskStatus = 'to-do' | 'in-progress' | 'done'
 export type TaskSortField = 'dueDate' | 'title' | 'priority'
@@ -10,7 +12,7 @@ export interface Task {
   status: TaskStatus
   dueDate: string
   priority: TaskPriority
-  tags: string[]
+  tags: Tag[]
 }
 
 export interface TaskCreatePayload {
@@ -18,8 +20,17 @@ export interface TaskCreatePayload {
   description?: string
   dueDate: string
   priority: TaskPriority
-  status: TaskStatus
-  tags: string[]
+  status?: TaskStatus
+  tags?: string[]
+}
+
+export interface TaskUpdatePayload {
+  title?: string
+  description?: string
+  dueDate?: string
+  priority?: TaskPriority
+  status?: TaskStatus
+  tags?: string[]
 }
 
 export interface TaskSortState {

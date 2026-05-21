@@ -28,21 +28,32 @@ const predefinedColors = [
   '#6366F1', // Indigo
 ]
 
-const handleAddTag = () => {
-  if (!newTagName.value.trim()) return
+const handleAddTag = async () => {
+  if (!newTagName.value.trim() || isSubmitting.value) return
   
-  taskStore.addTag({
-    name: newTagName.value.trim(),
-    color: newTagColor.value
-  })
-  
-  newTagName.value = ''
-  isCreating.value = false
+  isSubmitting.value = true
+  try {
+    await taskStore.addTag({
+      name: newTagName.value.trim(),
+      color: newTagColor.value
+    })
+    
+    newTagName.value = ''
+    isCreating.value = false
+  } catch (error) {
+    console.error('Failed to create tag', error)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-const handleDeleteTag = (id: string) => {
+const handleDeleteTag = async (id: string) => {
   if (confirm('Delete this tag? It will be removed from all tasks.')) {
-    taskStore.deleteTag(id)
+    try {
+      await taskStore.deleteTag(id)
+    } catch (error) {
+      console.error('Failed to delete tag', error)
+    }
   }
 }
 </script>
@@ -139,12 +150,13 @@ const handleDeleteTag = (id: string) => {
               >
                 Cancel
               </button>
-              <button
+              <button 
                 @click="handleAddTag"
-                :disabled="!newTagName.trim()"
+                :disabled="!newTagName.trim() || isSubmitting"
                 class="flex-1 py-2 text-sm font-semibold bg-accent text-white rounded-xl hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Tag
+                <span v-if="isSubmitting">Saving...</span>
+                <span v-else>Save Tag</span>
               </button>
             </div>
           </div>

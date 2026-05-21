@@ -9,15 +9,17 @@ const authStore = useAuthStore()
 const name = ref('')
 const email = ref('')
 const password = ref('')
-const errors = ref<Record<string, string>>({})
+const passwordConfirmation = ref('')
+const errors = ref<Record<string, string[]>>({})
 
-const handleRegister = () => {
+const handleRegister = async () => {
   errors.value = {}
   
-  const result = authStore.register({
+  const result = await authStore.register({
     name: name.value,
     email: email.value,
-    password: password.value
+    password: password.value,
+    password_confirmation: passwordConfirmation.value
   })
   
   if (result.success) {
@@ -32,15 +34,15 @@ const handleRegister = () => {
   <div class="space-y-6">
     <div class="text-center sm:text-left border-b border-border pb-4">
       <h2 class="font-heading text-2xl font-bold text-text-primary">
-        Register Account
+        Create Account
       </h2>
       <p class="text-xs text-text-secondary mt-1">
-        Get started by creating your account
+        Sign up to start organizing your tasks.
       </p>
     </div>
 
-    <form @submit.prevent="handleRegister" class="space-y-5" novalidate>
-      <!-- Full Name -->
+    <form @submit.prevent="handleRegister" class="space-y-4" novalidate>
+      <!-- Name Input -->
       <div class="space-y-1.5">
         <label for="name" class="text-xs font-semibold" :class="errors.name ? 'text-danger' : 'text-text-secondary'">
           Full Name
@@ -50,14 +52,14 @@ const handleRegister = () => {
           v-model="name"
           type="text"
           required
-          placeholder="Hari Saputra"
+          placeholder="John Doe"
           class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
           :class="errors.name ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
-        <p v-if="errors.name" class="text-[10px] font-medium text-danger mt-1">{{ errors.name }}</p>
+        <p v-if="errors.name" class="text-[10px] font-medium text-danger mt-1">{{ errors.name[0] }}</p>
       </div>
 
-      <!-- Email Address -->
+      <!-- Email Input -->
       <div class="space-y-1.5">
         <label for="email" class="text-xs font-semibold" :class="errors.email ? 'text-danger' : 'text-text-secondary'">
           Email Address
@@ -71,10 +73,10 @@ const handleRegister = () => {
           class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
           :class="errors.email ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
-        <p v-if="errors.email" class="text-[10px] font-medium text-danger mt-1">{{ errors.email }}</p>
+        <p v-if="errors.email" class="text-[10px] font-medium text-danger mt-1">{{ errors.email[0] }}</p>
       </div>
 
-      <!-- Password -->
+      <!-- Password Input -->
       <div class="space-y-1.5">
         <label for="password" class="text-xs font-semibold" :class="errors.password ? 'text-danger' : 'text-text-secondary'">
           Password
@@ -88,26 +90,45 @@ const handleRegister = () => {
           class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
           :class="errors.password ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
-        <p v-if="errors.password" class="text-[10px] font-medium text-danger mt-1">{{ errors.password }}</p>
+        <p v-if="errors.password" class="text-[10px] font-medium text-danger mt-1">{{ errors.password[0] }}</p>
+      </div>
+
+      <!-- Password Confirmation Input -->
+      <div class="space-y-1.5">
+        <label for="passwordConfirmation" class="text-xs font-semibold" :class="errors.password_confirmation ? 'text-danger' : 'text-text-secondary'">
+          Confirm Password
+        </label>
+        <input
+          id="passwordConfirmation"
+          v-model="passwordConfirmation"
+          type="password"
+          required
+          placeholder="Confirm password"
+          class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
+          :class="errors.password_confirmation ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
+        />
+        <p v-if="errors.password_confirmation" class="text-[10px] font-medium text-danger mt-1">{{ errors.password_confirmation[0] }}</p>
       </div>
 
       <!-- Submit button -->
       <div class="pt-2">
         <button
           type="submit"
-          class="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 cursor-pointer text-center text-sm"
+          :disabled="authStore.isLoading"
+          class="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 cursor-pointer text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Account
+          <span v-if="authStore.isLoading">Creating account...</span>
+          <span v-else>Create Account</span>
         </button>
       </div>
     </form>
 
-    <div class="text-center pt-4 border-t border-border/50 text-xs">
-      <span class="text-text-secondary">Already have one?</span>
-      <RouterLink to="/login" class="text-accent font-bold ml-1 hover:underline">
-        Sign in to existing account
-      </RouterLink>
+    <!-- Footer links -->
+    <div class="text-center text-xs text-text-secondary pt-2">
+      Already have an account? 
+      <router-link to="/auth/login" class="text-accent font-semibold hover:underline">
+        Sign in
+      </router-link>
     </div>
   </div>
 </template>
-

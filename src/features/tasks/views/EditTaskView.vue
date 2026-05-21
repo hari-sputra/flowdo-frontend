@@ -5,6 +5,7 @@ import { useTaskStore } from '@/stores/task.store'
 import dayjs from 'dayjs'
 import TagManagerModal from '../components/shared/TagManagerModal.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
+import { taskService } from '@/services/task.service'
 
 const taskStore = useTaskStore()
 const router = useRouter()
@@ -19,18 +20,31 @@ const showTagModal = ref(false)
 
 const showDeleteConfirm = ref(false)
 const taskId = route.params.id as string
+const isLoading = ref(true)
+const isSubmitting = ref(false)
 
-onMounted(() => {
-  const task = taskStore.tasks.find(t => t.id === taskId)
-  if (task) {
-    title.value = task.title
-    description.value = task.description || ''
-    dueDate.value = task.dueDate
-    priority.value = task.priority
-    selectedTags.value = [...task.tags]
-  } else {
-    // redirect if not found
+onMounted(async () => {
+  try {
+    let task = taskStore.tasks.find(t => t.id === taskId)
+    if (!task) {
+      // If refreshed on edit page, fetch it directly
+      task = await taskService.fetchById(taskId)
+    }
+    if (task) {
+      title.value = task.title
+      description.value = task.description || ''
+      dueDate.value = task.dueDate
+      priority.value = task.priority
+      // Extract tag names for the form
+      selectedTags.value = task.tags.map(t => t.name)
+    } else {
+      router.replace('/tasks/today')
+    }
+  } catch (error) {
+    console.error('Failed to load task', error)
     router.replace('/tasks/today')
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -46,24 +60,38 @@ const toggleTag = (tagName: string) => {
   }
 }
 
-const handleUpdateTask = () => {
-  if (!title.value.trim()) return
+const handleUpdateTask = async () => {
+  if (!title.value.trim() || isSubmitting.value) return
   
-  taskStore.updateTask(taskId, {
-    title: title.value,
-    description: description.value,
-    dueDate: dueDate.value,
-    priority: priority.value,
-    tags: selectedTags.value.length > 0 ? selectedTags.value : ['Work']
-  })
-  
-  router.back()
+  isSubmitting.value = true
+  try {
+    await taskStore.updateTask(taskId, {
+      title: title.value,
+      description: description.value,
+      dueDate: dueDate.value,
+      priority: priority.value,
+      tags: selectedTags.value
+    })
+    
+    // Route back to today tasks view
+    router.push('/tasks/today')
+  } catch (error) {
+    console.error('Failed to update task', error)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-const executeDelete = () => {
-  taskStore.deleteTask(taskId)
-  showDeleteConfirm.value = false
-  router.back()
+const handleDeleteTask = async () => {
+  isSubmitting.value = true
+  try {
+    await taskStore.deleteTask(taskId)
+    router.push('/tasks/today')
+  } catch (error) {
+    console.error('Failed to delete task', error)
+    isSubmitting.value = false
+    showDeleteConfirm.value = false
+  }
 }
 </script>
 
@@ -189,6 +217,8 @@ const executeDelete = () => {
             ]"
             :style="selectedTags.includes(tag.name) ? { backgroundColor: tag.color, ringColor: tag.color } : {}"
           >
+
+          >
             {{ tag.name }}
           </button>
         </div>
@@ -205,19 +235,24 @@ const executeDelete = () => {
         </button>
         <button 
           type="submit"
-          class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm"
+          :disabled="isSubmitting"
+          class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save Changes
+          <span v-if="isSubmitting">Saving...</span>
+          <span v-else>Save Changes</span>
         </button>
       </div>
     </form>
 
     <TagManagerModal :open="showTagModal" @close="showTagModal = false" />
+    <!-- Confirm Delete Dialog -->
     <ConfirmDialog
-      :open="showDeleteConfirm"
+      v-if="showDeleteConfirm"
       title="Delete Task"
       message="Are you sure you want to delete this task? This action cannot be undone."
-      @confirm="executeDelete"
+      confirmText="Delete"
+      confirmType="danger"
+      @confirm="handleDeleteTask"
       @cancel="showDeleteConfirm = false"
     />
   </div>

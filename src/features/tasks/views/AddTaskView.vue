@@ -27,20 +27,29 @@ const toggleTag = (tagName: string) => {
   }
 }
 
-const handleAddTask = () => {
-  if (!title.value.trim()) return
+const isSubmitting = ref(false)
+
+const handleAddTask = async () => {
+  if (!title.value.trim() || isSubmitting.value) return
   
-  taskStore.addTask({
-    title: title.value,
-    description: description.value,
-    status: 'to-do',
-    dueDate: dueDate.value,
-    priority: priority.value,
-    tags: selectedTags.value.length > 0 ? selectedTags.value : ['Work'] // Default tag if empty
-  })
-  
-  // Route back to today tasks view
-  router.push('/tasks/today')
+  isSubmitting.value = true
+  try {
+    await taskStore.addTask({
+      title: title.value,
+      description: description.value,
+      status: 'to-do',
+      dueDate: dueDate.value,
+      priority: priority.value,
+      tags: selectedTags.value.length > 0 ? selectedTags.value : ['Work'] // Default tag if empty
+    })
+    
+    // Route back to today tasks view
+    router.push('/tasks/today')
+  } catch (error) {
+    console.error('Failed to add task', error)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -173,11 +182,17 @@ const handleAddTask = () => {
         >
           Cancel
         </button>
-        <button 
+      </div>
+
+      <!-- Submit button -->
+      <div class="pt-6">
+        <button
           type="submit"
-          class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm"
+          :disabled="isSubmitting"
+          class="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 cursor-pointer text-center flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Task
+          <span v-if="isSubmitting">Creating...</span>
+          <span v-else>Create Task</span>
         </button>
       </div>
     </form>

@@ -14,7 +14,11 @@ const router = useRouter()
 
 const todayStr = dayjs().format('dddd, D MMMM')
 
-onMounted(() => {
+onMounted(async () => {
+  await Promise.all([
+    taskStore.fetchTasks(),
+    taskStore.fetchTags()
+  ])
   taskStore.showDueTodayToast()
 })
 

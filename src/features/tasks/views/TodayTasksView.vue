@@ -53,9 +53,9 @@ const confirmDelete = (id: string) => {
   showDeleteConfirm.value = true
 }
 
-const executeDelete = () => {
+const executeDelete = async () => {
   if (taskToDelete.value) {
-    taskStore.deleteTask(taskToDelete.value)
+    await taskStore.deleteTask(taskToDelete.value)
   }
   showDeleteConfirm.value = false
   taskToDelete.value = null
@@ -170,9 +170,11 @@ const executeDelete = () => {
     </div>
 
     <ConfirmDialog
-      :open="showDeleteConfirm"
+      v-if="showDeleteConfirm"
       title="Delete Task"
       message="Are you sure you want to delete this task? This action cannot be undone."
+      confirmText="Delete"
+      confirmType="danger"
       @confirm="executeDelete"
       @cancel="showDeleteConfirm = false"
     />

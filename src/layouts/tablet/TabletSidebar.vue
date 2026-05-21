@@ -38,9 +38,9 @@ const navItems = [
 
 const settingsActive = computed(() => route.path === '/settings')
 
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/login')
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/auth/login')
 }
 </script>
 

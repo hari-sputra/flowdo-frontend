@@ -10,8 +10,8 @@ const taskStore = useTaskStore()
 
 const userDropdownOpen = ref(false)
 
-const handleLogout = () => {
-  authStore.logout()
+const handleLogout = async () => {
+  await authStore.logout()
   router.push('/auth/login')
   userDropdownOpen.value = false
 }

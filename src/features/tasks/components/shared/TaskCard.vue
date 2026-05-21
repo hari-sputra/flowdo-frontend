@@ -17,8 +17,8 @@ const emit = defineEmits<{
 const router = useRouter()
 const taskStore = useTaskStore()
 
-const toggleStatus = () => {
-  taskStore.toggleTaskStatus(props.task.id)
+const toggleStatus = async () => {
+  await taskStore.toggleTaskStatus(props.task.id)
 }
 
 const editTask = () => {
@@ -97,10 +97,11 @@ const isDone = computed(() => props.task.status === 'done')
         <div v-if="task.tags && task.tags.length > 0" class="flex flex-wrap gap-1.5 mt-2.5">
           <span
             v-for="tag in task.tags"
-            :key="tag"
+            :key="tag.id"
             class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-border text-text-secondary"
+            :style="{ backgroundColor: tag.color + '20', color: tag.color }"
           >
-            #{{ tag }}
+            #{{ tag.name }}
           </span>
         </div>
       </div>

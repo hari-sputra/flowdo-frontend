@@ -79,9 +79,17 @@ const router = createRouter({
 })
 
 // Navigation Guards
-router.beforeEach((to, from, next) => {
+let isAppInitialized = false
+
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
+  // Wait for initial auth check on first load
+  if (!isAppInitialized) {
+    await authStore.checkAuth()
+    isAppInitialized = true
+  }
+
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/auth/login')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {

@@ -1,114 +1,120 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
-import type { Task } from '@/types/task.types'
-import type { Tag } from '@/types/tag.types'
+import type { Task, TaskCreatePayload, TaskUpdatePayload } from '@/types/task.types'
+import type { Tag, TagCreatePayload } from '@/types/tag.types'
 import { useTaskSorting } from '@/composables/useTaskSorting'
 import { useDueDateAlert } from '@/composables/useDueDateAlert'
+import { taskService } from '@/services/task.service'
+import { tagService } from '@/services/tag.service'
 
 export const useTaskStore = defineStore('tasks', () => {
   const todayStr = dayjs().format('YYYY-MM-DD')
   const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD')
 
-  // Prepopulate tasks from the Figma community design relative to today
-  const tasks = useLocalStorage<Task[]>('flowdo_tasks', [
-    {
-      id: 'task-1',
-      title: 'Market Research',
-      description: 'Conduct market research and user analysis for the grocery shopping application.',
-      status: 'done',
-      dueDate: todayStr,
-      priority: 'medium',
-      tags: ['Work']
-    },
-    {
-      id: 'task-2',
-      title: 'Competitive Analysis',
-      description: 'Analyze competitors in the grocery shopping space to identify gaps and features.',
-      status: 'in-progress',
-      dueDate: todayStr,
-      priority: 'high',
-      tags: ['Work']
-    },
-    {
-      id: 'task-3',
-      title: 'Create Low-fidelity Wireframe',
-      description: 'Sketch out initial layout and basic structures for the Uber Eats challenge screen flow.',
-      status: 'to-do',
-      dueDate: todayStr,
-      priority: 'urgent',
-      tags: ['Personal']
-    },
-    {
-      id: 'task-4',
-      title: 'How to pitch a Design Sprint',
-      description: 'Study materials and prepare slides about design sprints for the client meeting.',
-      status: 'to-do',
-      dueDate: tomorrowStr,
-      priority: 'low',
-      tags: ['Study']
-    }
-  ])
-
-  // Tags State
-  const tags = useLocalStorage<Tag[]>('flowdo_tags', [
-    { id: 'tag-1', name: 'Work', color: '#8764FF', isDefault: true },
-    { id: 'tag-2', name: 'Personal', color: '#FF7D53', isDefault: true },
-    { id: 'tag-3', name: 'Study', color: '#2555FF', isDefault: true },
-    { id: 'tag-4', name: 'Fitness', color: '#F478B8', isDefault: true }
-  ])
+  const tasks = ref<Task[]>([])
+  const tags = ref<Tag[]>([])
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   // Use Composables for Sorting and Alerts
   const { sortState, sortedTasks, toggleSort } = useTaskSorting(tasks)
   const { dueTodayTasks, overdueTasks, showDueTodayToast, isOverdue, isDueToday } = useDueDateAlert(tasks)
 
-  // Task Actions
-  const addTask = (task: Omit<Task, 'id'>) => {
-    const id = `task-${Math.random().toString(36).substring(2, 9)}`
-    tasks.value.push({ ...task, id })
-    return id
-  }
-
-  const updateTask = (id: string, updates: Partial<Task>) => {
-    const index = tasks.value.findIndex(t => t.id === id)
-    if (index !== -1) {
-      tasks.value[index] = { ...tasks.value[index], ...updates }
+  const fetchTasks = async () => {
+    isLoading.value = true
+    error.value = null
+    try {
+      tasks.value = await taskService.fetchAll()
+    } catch (e: any) {
+      error.value = 'Failed to fetch tasks'
+      console.error(e)
+    } finally {
+      isLoading.value = false
     }
   }
 
-  const deleteTask = (id: string) => {
-    tasks.value = tasks.value.filter(t => t.id !== id)
+  const fetchTags = async () => {
+    try {
+      tags.value = await tagService.fetchAll()
+    } catch (e: any) {
+      console.error('Failed to fetch tags', e)
+    }
   }
 
-  const toggleTaskStatus = (id: string) => {
-    const task = tasks.value.find(t => t.id === id)
-    if (task) {
-      if (task.status === 'to-do') {
-        task.status = 'in-progress'
-      } else if (task.status === 'in-progress') {
-        task.status = 'done'
-      } else {
-        task.status = 'to-do'
+  // Task Actions
+  const addTask = async (taskPayload: TaskCreatePayload) => {
+    try {
+      const newTask = await taskService.create(taskPayload)
+      tasks.value.push(newTask)
+      return newTask
+    } catch (e: any) {
+      console.error('Failed to create task', e)
+      throw e
+    }
+  }
+
+  const updateTask = async (id: string, updates: TaskUpdatePayload) => {
+    try {
+      const updatedTask = await taskService.update(id, updates)
+      const index = tasks.value.findIndex(t => t.id === id)
+      if (index !== -1) {
+        tasks.value[index] = updatedTask
       }
+      return updatedTask
+    } catch (e: any) {
+      console.error('Failed to update task', e)
+      throw e
+    }
+  }
+
+  const deleteTask = async (id: string) => {
+    try {
+      await taskService.remove(id)
+      tasks.value = tasks.value.filter(t => t.id !== id)
+    } catch (e: any) {
+      console.error('Failed to delete task', e)
+      throw e
+    }
+  }
+
+  const toggleTaskStatus = async (id: string) => {
+    try {
+      const updatedTask = await taskService.toggleStatus(id)
+      const index = tasks.value.findIndex(t => t.id === id)
+      if (index !== -1) {
+        tasks.value[index] = updatedTask
+      }
+    } catch (e: any) {
+      console.error('Failed to toggle task status', e)
+      throw e
     }
   }
 
   // Tag Actions
-  const addTag = (tag: Omit<Tag, 'id'>) => {
-    const id = `tag-${Math.random().toString(36).substring(2, 9)}`
-    tags.value.push({ ...tag, id, isDefault: false })
-    return id
+  const addTag = async (tagPayload: TagCreatePayload) => {
+    try {
+      const newTag = await tagService.create(tagPayload)
+      tags.value.push(newTag)
+      return newTag
+    } catch (e: any) {
+      console.error('Failed to create tag', e)
+      throw e
+    }
   }
 
-  const deleteTag = (id: string) => {
+  const deleteTag = async (id: string) => {
     const tag = tags.value.find(t => t.id === id)
     if (tag && !tag.isDefault) {
-      tags.value = tags.value.filter(t => t.id !== id)
-      // Optional: remove this tag from all tasks
-      tasks.value.forEach(t => {
-        t.tags = t.tags.filter(tagName => tagName !== tag.name)
-      })
+      try {
+        await tagService.remove(id)
+        tags.value = tags.value.filter(t => t.id !== id)
+        // Also fetch tasks again because some tasks might have lost their tags on backend
+        await fetchTasks()
+      } catch (e: any) {
+        console.error('Failed to delete tag', e)
+        throw e
+      }
     }
   }
 
@@ -152,12 +158,16 @@ export const useTaskStore = defineStore('tasks', () => {
   return {
     tasks,
     tags,
+    isLoading,
+    error,
     sortState,
     sortedTasks,
     overdueTasks,
     dueTodayTasks,
     dueTodayCount,
     dailyProgress,
+    fetchTasks,
+    fetchTags,
     addTask,
     updateTask,
     deleteTask,

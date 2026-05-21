@@ -8,12 +8,12 @@ const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
-const errors = ref<Record<string, string>>({})
+const errors = ref<Record<string, string[]>>({})
 
-const handleLogin = () => {
+const handleLogin = async () => {
   errors.value = {}
   
-  const result = authStore.login({
+  const result = await authStore.login({
     email: email.value,
     password: password.value
   })
@@ -52,7 +52,7 @@ const handleLogin = () => {
           class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
           :class="errors.email ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
-        <p v-if="errors.email" class="text-[10px] font-medium text-danger mt-1">{{ errors.email }}</p>
+        <p v-if="errors.email" class="text-[10px] font-medium text-danger mt-1">{{ errors.email[0] }}</p>
       </div>
 
       <!-- Password Input -->
@@ -69,16 +69,18 @@ const handleLogin = () => {
           class="w-full bg-surface-elevated border rounded-xl py-2.5 px-3.5 text-text-primary text-sm placeholder:text-text-secondary/40 focus:outline-none focus:ring-1 transition-all duration-200"
           :class="errors.password ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-accent focus:ring-accent'"
         />
-        <p v-if="errors.password" class="text-[10px] font-medium text-danger mt-1">{{ errors.password }}</p>
+        <p v-if="errors.password" class="text-[10px] font-medium text-danger mt-1">{{ errors.password[0] }}</p>
       </div>
 
       <!-- Submit button -->
       <div class="pt-2">
-        <button
+        <button 
+          :disabled="authStore.isLoading"
           type="submit"
-          class="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 cursor-pointer text-center text-sm"
+          class="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 cursor-pointer text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign In
+          <span v-if="authStore.isLoading">Signing in...</span>
+          <span v-else>Sign In</span>
         </button>
       </div>
     </form>

@@ -1,65 +1,70 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import type { User, LoginPayload, RegisterPayload } from '@/types/auth.types'
-import { validateEmail, validatePassword, validateRequired } from '@/utils/validation.utils'
+import { authService } from '@/services/auth.service'
+import type { AxiosError } from 'axios'
+import type { ApiValidationError } from '@/types/auth.types'
 
 export const useAuthStore = defineStore('auth', () => {
-  const currentUser = useLocalStorage<User | null>('flowdo_user', {
-    id: 'user-1',
-    name: 'Hari Saputra',
-    email: 'hari.saputra.dev@gmail.com'
-  })
+  const currentUser = ref<User | null>(null)
+  const isLoading = ref(false)
+  const errors = ref<Record<string, string[]>>({})
 
   const isAuthenticated = computed(() => currentUser.value !== null)
 
-  const login = (payload: LoginPayload) => {
-    const errors: Record<string, string> = {}
-    
-    const emailErr = validateEmail(payload.email)
-    if (emailErr) errors.email = emailErr
-    
-    const passErr = validatePassword(payload.password)
-    if (passErr) errors.password = passErr
-    
-    if (Object.keys(errors).length > 0) {
-      return { success: false, errors }
+  const login = async (payload: LoginPayload) => {
+    isLoading.value = true
+    errors.value = {}
+    try {
+      const user = await authService.login(payload)
+      currentUser.value = user
+      return { success: true }
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        const validationError = error.response.data as ApiValidationError
+        errors.value = validationError.errors
+      }
+      return { success: false, errors: errors.value }
+    } finally {
+      isLoading.value = false
     }
-    
-    currentUser.value = {
-      id: 'user-1',
-      name: 'Hari Saputra',
-      email: payload.email
-    }
-    return { success: true }
   }
 
-  const register = (payload: RegisterPayload) => {
-    const errors: Record<string, string> = {}
-    
-    const nameErr = validateRequired(payload.name, 'Name')
-    if (nameErr) errors.name = nameErr
-    
-    const emailErr = validateEmail(payload.email)
-    if (emailErr) errors.email = emailErr
-    
-    const passErr = validatePassword(payload.password)
-    if (passErr) errors.password = passErr
-    
-    if (Object.keys(errors).length > 0) {
-      return { success: false, errors }
+  const register = async (payload: RegisterPayload) => {
+    isLoading.value = true
+    errors.value = {}
+    try {
+      const user = await authService.register(payload)
+      currentUser.value = user
+      return { success: true }
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        const validationError = error.response.data as ApiValidationError
+        errors.value = validationError.errors
+      }
+      return { success: false, errors: errors.value }
+    } finally {
+      isLoading.value = false
     }
-    
-    currentUser.value = {
-      id: 'user-2',
-      name: payload.name,
-      email: payload.email
-    }
-    return { success: true }
   }
 
-  const logout = () => {
-    currentUser.value = null
+  const logout = async () => {
+    try {
+      await authService.logout()
+    } catch (error) {
+      console.error('Logout failed:', error)
+    } finally {
+      currentUser.value = null
+    }
+  }
+
+  const checkAuth = async () => {
+    try {
+      const user = await authService.fetchUser()
+      currentUser.value = user
+    } catch (error) {
+      currentUser.value = null
+    }
   }
 
   const userInitials = computed(() => {
@@ -74,9 +79,12 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     currentUser,
     isAuthenticated,
+    isLoading,
+    errors,
     login,
     register,
     logout,
+    checkAuth,
     userInitials
   }
 })
