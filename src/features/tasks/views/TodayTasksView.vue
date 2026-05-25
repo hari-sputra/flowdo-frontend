@@ -83,7 +83,7 @@ const executeDelete = async () => {
         v-for="day in weekDays" 
         :key="day.fullDate"
         @click="selectDate(day.fullDate)"
-        class="flex flex-col items-center justify-center min-w-[3rem] py-2.5 rounded-xl cursor-pointer transition-all duration-200 shrink-0"
+        class="flex flex-col items-center justify-center min-w-12 py-2.5 rounded-xl cursor-pointer transition-all duration-200 shrink-0"
         :class="[
           selectedDate === day.fullDate
             ? 'bg-accent text-white shadow-sm font-semibold' 
