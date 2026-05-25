@@ -5,22 +5,22 @@ import type { ApiResponse } from '@/types/auth.types'
 export const taskService = {
   async fetchAll(params?: Record<string, any>): Promise<Task[]> {
     const response = await httpClient.get<ApiResponse<Task[]>>('/api/tasks', { params })
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task[])
   },
 
   async fetchById(id: string): Promise<Task> {
     const response = await httpClient.get<ApiResponse<Task>>(`/api/tasks/${id}`)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task)
   },
 
   async create(payload: TaskCreatePayload): Promise<Task> {
     const response = await httpClient.post<ApiResponse<Task>>('/api/tasks', payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task)
   },
 
   async update(id: string, payload: TaskUpdatePayload): Promise<Task> {
     const response = await httpClient.put<ApiResponse<Task>>(`/api/tasks/${id}`, payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task)
   },
 
   async remove(id: string): Promise<void> {
@@ -29,11 +29,11 @@ export const taskService = {
 
   async toggleStatus(id: string): Promise<Task> {
     const response = await httpClient.patch<ApiResponse<Task>>(`/api/tasks/${id}/toggle`)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task)
   },
 
   async fetchDueToday(): Promise<Task[]> {
     const response = await httpClient.get<ApiResponse<Task[]>>('/api/tasks/due-today')
-    return response.data.data
+    return response.data.data || (response.data as unknown as Task[])
   }
 }

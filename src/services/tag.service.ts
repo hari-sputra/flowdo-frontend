@@ -5,17 +5,17 @@ import type { ApiResponse } from '@/types/auth.types'
 export const tagService = {
   async fetchAll(): Promise<Tag[]> {
     const response = await httpClient.get<ApiResponse<Tag[]>>('/api/tags')
-    return response.data.data
+    return response.data.data || (response.data as unknown as Tag[])
   },
 
   async create(payload: TagCreatePayload): Promise<Tag> {
     const response = await httpClient.post<ApiResponse<Tag>>('/api/tags', payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Tag)
   },
 
   async update(id: string, payload: Partial<TagCreatePayload>): Promise<Tag> {
     const response = await httpClient.put<ApiResponse<Tag>>(`/api/tags/${id}`, payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as Tag)
   },
 
   async remove(id: string): Promise<void> {

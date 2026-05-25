@@ -2,7 +2,7 @@ import type { Tag } from './tag.types'
 
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type TaskStatus = 'to-do' | 'in-progress' | 'done'
-export type TaskSortField = 'dueDate' | 'title' | 'priority'
+export type TaskSortField = 'dueDate' | 'title' | 'priority' | 'status'
 export type SortDirection = 'asc' | 'desc'
 
 export interface Task {

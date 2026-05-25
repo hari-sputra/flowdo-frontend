@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTaskStore } from '@/stores/task.store'
 import dayjs from 'dayjs'
 import TagManagerModal from '../components/shared/TagManagerModal.vue'
 
 const taskStore = useTaskStore()
+
+onMounted(() => {
+  taskStore.fetchTags()
+})
 const router = useRouter()
 
 const title = ref('')
@@ -17,6 +21,16 @@ const showTagModal = ref(false)
 
 const selectPriority = (p: 'low' | 'medium' | 'high' | 'urgent') => {
   priority.value = p
+}
+
+const getPriorityActiveClass = (p: string) => {
+  switch (p) {
+    case 'urgent': return 'bg-red-500 border-red-500 text-white shadow-md'
+    case 'high': return 'bg-orange-500 border-orange-500 text-white shadow-md'
+    case 'medium': return 'bg-yellow-500 border-yellow-500 text-white shadow-md'
+    case 'low': return 'bg-green-500 border-green-500 text-white shadow-md'
+    default: return 'bg-accent border-accent text-white shadow-md'
+  }
 }
 
 const toggleTag = (tagName: string) => {
@@ -124,10 +138,10 @@ const handleAddTask = async () => {
             v-for="p in (['low', 'medium', 'high', 'urgent'] as const)"
             :key="p"
             @click="selectPriority(p)"
-            class="py-2.5 px-1 rounded-xl text-xs font-bold border transition-all duration-200 capitalize"
+            class="py-2.5 px-1 rounded-xl text-xs font-bold border transition-all duration-200 capitalize cursor-pointer"
             :class="[
               priority === p 
-                ? 'bg-accent/10 border-accent text-accent shadow-sm' 
+                ? getPriorityActiveClass(p)
                 : 'bg-surface-elevated border-border text-text-secondary hover:bg-border/20'
             ]"
           >
@@ -145,7 +159,7 @@ const handleAddTask = async () => {
           <button 
             type="button"
             @click="showTagModal = true"
-            class="text-xs font-semibold text-accent hover:underline flex items-center gap-1"
+            class="text-xs font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer"
           >
             <svg class="w-3.5 h-3.5 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -160,29 +174,16 @@ const handleAddTask = async () => {
             v-for="tag in taskStore.tags"
             :key="tag.id"
             @click="toggleTag(tag.name)"
-            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200"
-            :class="[
-              selectedTags.includes(tag.name) 
-                ? 'text-white shadow-sm ring-2 ring-offset-1 dark:ring-offset-background' 
-                : 'bg-surface-elevated text-text-secondary hover:bg-border/30 border border-border'
-            ]"
-            :style="selectedTags.includes(tag.name) ? { backgroundColor: tag.color, ringColor: tag.color } : {}"
+            class="status-badge cursor-pointer transform hover:scale-103 active:scale-98 transition-all duration-150"
+            :style="selectedTags.includes(tag.name) 
+              ? { backgroundColor: tag.color, color: '#ffffff' } 
+              : { backgroundColor: tag.color + '1A', color: tag.color }"
           >
             {{ tag.name }}
           </button>
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="pt-4 flex gap-3">
-        <button 
-          type="button"
-          @click="router.back()"
-          class="flex-1 bg-surface-elevated hover:bg-border/30 border border-border text-text-secondary font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center text-sm"
-        >
-          Cancel
-        </button>
-      </div>
 
       <!-- Submit button -->
       <div class="pt-6">

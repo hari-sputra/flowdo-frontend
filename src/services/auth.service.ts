@@ -5,13 +5,13 @@ export const authService = {
   async login(payload: LoginPayload): Promise<User> {
     await initializeCsrf()
     const response = await httpClient.post<ApiResponse<User>>('/api/login', payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as User)
   },
 
   async register(payload: RegisterPayload): Promise<User> {
     await initializeCsrf()
     const response = await httpClient.post<ApiResponse<User>>('/api/register', payload)
-    return response.data.data
+    return response.data.data || (response.data as unknown as User)
   },
 
   async logout(): Promise<void> {
@@ -20,6 +20,6 @@ export const authService = {
 
   async fetchUser(): Promise<User> {
     const response = await httpClient.get<ApiResponse<User>>('/api/user')
-    return response.data.data
+    return response.data.data || (response.data as unknown as User)
   }
 }

@@ -3,7 +3,7 @@ import type { Task, TaskSortState, TaskSortField } from '@/types/task.types'
 
 export function useTaskSorting(tasks: Ref<Task[]>) {
   const sortState = ref<TaskSortState>({
-    field: 'dueDate',
+    field: 'status',
     direction: 'asc'
   })
 
@@ -40,6 +40,16 @@ export function useTaskSorting(tasks: Ref<Task[]>) {
         case 'priority': {
           const weightA = priorityWeights[a.priority] || 0
           const weightB = priorityWeights[b.priority] || 0
+          return (weightA - weightB) * modifier
+        }
+        case 'status': {
+          const statusWeights: Record<string, number> = {
+            'to-do': 1,
+            'in-progress': 2,
+            'done': 3
+          }
+          const weightA = statusWeights[a.status] || 0
+          const weightB = statusWeights[b.status] || 0
           return (weightA - weightB) * modifier
         }
         default:

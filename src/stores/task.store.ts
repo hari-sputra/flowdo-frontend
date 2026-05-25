@@ -95,7 +95,7 @@ export const useTaskStore = defineStore('tasks', () => {
   const addTag = async (tagPayload: TagCreatePayload) => {
     try {
       const newTag = await tagService.create(tagPayload)
-      tags.value.push(newTag)
+      await fetchTags()
       return newTag
     } catch (e: any) {
       console.error('Failed to create tag', e)

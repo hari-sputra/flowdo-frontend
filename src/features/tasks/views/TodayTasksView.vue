@@ -109,7 +109,7 @@ const executeDelete = async () => {
     <div class="flex border-b border-border/50 pb-1 gap-6 text-sm font-medium overflow-x-auto scrollbar-none">
       <button 
         @click="activeStatusFilter = 'all'"
-        class="pb-2 relative whitespace-nowrap"
+        class="pb-2 relative whitespace-nowrap cursor-pointer"
         :class="activeStatusFilter === 'all' ? 'text-accent font-bold' : 'text-text-secondary hover:text-text-primary transition-colors'"
       >
         All
@@ -118,7 +118,7 @@ const executeDelete = async () => {
       
       <button 
         @click="activeStatusFilter = 'todo'"
-        class="pb-2 relative whitespace-nowrap"
+        class="pb-2 relative whitespace-nowrap cursor-pointer"
         :class="activeStatusFilter === 'todo' ? 'text-accent font-bold' : 'text-text-secondary hover:text-text-primary transition-colors'"
       >
         To-Do
@@ -127,7 +127,7 @@ const executeDelete = async () => {
 
       <button 
         @click="activeStatusFilter = 'inprogress'"
-        class="pb-2 relative whitespace-nowrap"
+        class="pb-2 relative whitespace-nowrap cursor-pointer"
         :class="activeStatusFilter === 'inprogress' ? 'text-accent font-bold' : 'text-text-secondary hover:text-text-primary transition-colors'"
       >
         In Progress
@@ -136,7 +136,7 @@ const executeDelete = async () => {
 
       <button 
         @click="activeStatusFilter = 'completed'"
-        class="pb-2 relative whitespace-nowrap"
+        class="pb-2 relative whitespace-nowrap cursor-pointer"
         :class="activeStatusFilter === 'completed' ? 'text-accent font-bold' : 'text-text-secondary hover:text-text-primary transition-colors'"
       >
         Completed
@@ -145,7 +145,7 @@ const executeDelete = async () => {
     </div>
 
     <!-- 3. Tasks List for Selected Day -->
-    <div class="space-y-3" v-if="filteredTasks.length > 0">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" v-if="filteredTasks.length > 0">
       <TaskCard 
         v-for="task in filteredTasks" 
         :key="task.id" 
@@ -170,11 +170,9 @@ const executeDelete = async () => {
     </div>
 
     <ConfirmDialog
-      v-if="showDeleteConfirm"
+      :open="showDeleteConfirm"
       title="Delete Task"
       message="Are you sure you want to delete this task? This action cannot be undone."
-      confirmText="Delete"
-      confirmType="danger"
       @confirm="executeDelete"
       @cancel="showDeleteConfirm = false"
     />

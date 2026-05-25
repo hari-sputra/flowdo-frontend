@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useTaskStore } from '@/stores/task.store'
 import type { Tag } from '@/types/tag.types'
+import ConfirmDialog from './ConfirmDialog.vue'
 
-defineProps<{
+const props = defineProps<{
   open: boolean
 }>()
 
@@ -13,9 +14,19 @@ const emit = defineEmits<{
 
 const taskStore = useTaskStore()
 
+watch(() => props.open, (isOpen) => {
+  if (isOpen) {
+    taskStore.fetchTags()
+  }
+}, { immediate: true })
+
 const newTagName = ref('')
 const newTagColor = ref('#8764FF')
 const isCreating = ref(false)
+const isSubmitting = ref(false)
+
+const showDeleteConfirm = ref(false)
+const tagToDelete = ref<string | null>(null)
 
 const predefinedColors = [
   '#8764FF', // Purple
@@ -40,6 +51,7 @@ const handleAddTag = async () => {
     
     newTagName.value = ''
     isCreating.value = false
+    emit('close')
   } catch (error) {
     console.error('Failed to create tag', error)
   } finally {
@@ -47,13 +59,21 @@ const handleAddTag = async () => {
   }
 }
 
-const handleDeleteTag = async (id: string) => {
-  if (confirm('Delete this tag? It will be removed from all tasks.')) {
-    try {
-      await taskStore.deleteTag(id)
-    } catch (error) {
-      console.error('Failed to delete tag', error)
-    }
+const confirmDeleteAction = (id: string) => {
+  tagToDelete.value = id
+  showDeleteConfirm.value = true
+}
+
+const executeDeleteTag = async () => {
+  if (!tagToDelete.value) return
+  
+  try {
+    await taskStore.deleteTag(tagToDelete.value)
+  } catch (error) {
+    console.error('Failed to delete tag', error)
+  } finally {
+    showDeleteConfirm.value = false
+    tagToDelete.value = null
   }
 }
 </script>
@@ -93,7 +113,7 @@ const handleDeleteTag = async (id: string) => {
             
             <button
               v-if="!tag.isDefault"
-              @click="handleDeleteTag(tag.id)"
+              @click="confirmDeleteAction(tag.id)"
               class="p-1.5 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
               title="Delete Tag"
             >
@@ -165,4 +185,12 @@ const handleDeleteTag = async (id: string) => {
       </div>
     </div>
   </transition>
+  
+  <ConfirmDialog
+    :open="showDeleteConfirm"
+    title="Delete Tag"
+    message="Are you sure you want to delete this tag? It will be removed from all tasks."
+    @confirm="executeDeleteTag"
+    @cancel="showDeleteConfirm = false"
+  />
 </template>

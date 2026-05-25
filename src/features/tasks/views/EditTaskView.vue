@@ -25,6 +25,7 @@ const isSubmitting = ref(false)
 
 onMounted(async () => {
   try {
+    taskStore.fetchTags()
     let task = taskStore.tasks.find(t => t.id === taskId)
     if (!task) {
       // If refreshed on edit page, fetch it directly
@@ -50,6 +51,16 @@ onMounted(async () => {
 
 const selectPriority = (p: 'low' | 'medium' | 'high' | 'urgent') => {
   priority.value = p
+}
+
+const getPriorityActiveClass = (p: string) => {
+  switch (p) {
+    case 'urgent': return 'bg-red-500 border-red-500 text-white shadow-md'
+    case 'high': return 'bg-orange-500 border-orange-500 text-white shadow-md'
+    case 'medium': return 'bg-yellow-500 border-yellow-500 text-white shadow-md'
+    case 'low': return 'bg-green-500 border-green-500 text-white shadow-md'
+    default: return 'bg-accent border-accent text-white shadow-md'
+  }
 }
 
 const toggleTag = (tagName: string) => {
@@ -110,7 +121,7 @@ const handleDeleteTask = async () => {
       <button 
         type="button" 
         @click="showDeleteConfirm = true"
-        class="text-xs font-semibold text-danger bg-danger/10 px-3 py-1.5 rounded-lg hover:bg-danger/20 transition-colors"
+        class="text-xs font-semibold text-danger bg-danger/10 px-3 py-1.5 rounded-lg hover:bg-danger/20 transition-colors cursor-pointer"
       >
         Delete
       </button>
@@ -173,10 +184,10 @@ const handleDeleteTask = async () => {
             v-for="p in (['low', 'medium', 'high', 'urgent'] as const)"
             :key="p"
             @click="selectPriority(p)"
-            class="py-2.5 px-1 rounded-xl text-xs font-bold border transition-all duration-200 capitalize"
+            class="py-2.5 px-1 rounded-xl text-xs font-bold border transition-all duration-200 capitalize cursor-pointer"
             :class="[
               priority === p 
-                ? 'bg-accent/10 border-accent text-accent shadow-sm' 
+                ? getPriorityActiveClass(p)
                 : 'bg-surface-elevated border-border text-text-secondary hover:bg-border/20'
             ]"
           >
@@ -194,7 +205,7 @@ const handleDeleteTask = async () => {
           <button 
             type="button"
             @click="showTagModal = true"
-            class="text-xs font-semibold text-accent hover:underline flex items-center gap-1"
+            class="text-xs font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer"
           >
             <svg class="w-3.5 h-3.5 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -209,15 +220,10 @@ const handleDeleteTask = async () => {
             v-for="tag in taskStore.tags"
             :key="tag.id"
             @click="toggleTag(tag.name)"
-            class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all duration-200"
-            :class="[
-              selectedTags.includes(tag.name) 
-                ? 'text-white shadow-sm ring-2 ring-offset-1 dark:ring-offset-background' 
-                : 'bg-surface-elevated text-text-secondary hover:bg-border/30 border border-border'
-            ]"
-            :style="selectedTags.includes(tag.name) ? { backgroundColor: tag.color, ringColor: tag.color } : {}"
-          >
-
+            class="status-badge cursor-pointer transform hover:scale-103 active:scale-98 transition-all duration-150"
+            :style="selectedTags.includes(tag.name) 
+              ? { backgroundColor: tag.color, color: '#ffffff' } 
+              : { backgroundColor: tag.color + '1A', color: tag.color }"
           >
             {{ tag.name }}
           </button>
@@ -229,14 +235,14 @@ const handleDeleteTask = async () => {
         <button 
           type="button"
           @click="router.back()"
-          class="flex-1 bg-surface-elevated hover:bg-border/30 border border-border text-text-secondary font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center text-sm"
+          class="flex-1 bg-surface-elevated hover:bg-border/30 border border-border text-text-secondary font-semibold py-3 px-4 rounded-xl transition-all duration-200 text-center text-sm cursor-pointer"
         >
           Cancel
         </button>
         <button 
           type="submit"
           :disabled="isSubmitting"
-          class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 bg-accent hover:bg-accent/90 text-white font-semibold py-3 px-4 rounded-xl shadow-md transform active:scale-98 transition-all duration-200 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <span v-if="isSubmitting">Saving...</span>
           <span v-else>Save Changes</span>
@@ -247,11 +253,9 @@ const handleDeleteTask = async () => {
     <TagManagerModal :open="showTagModal" @close="showTagModal = false" />
     <!-- Confirm Delete Dialog -->
     <ConfirmDialog
-      v-if="showDeleteConfirm"
+      :open="showDeleteConfirm"
       title="Delete Task"
       message="Are you sure you want to delete this task? This action cannot be undone."
-      confirmText="Delete"
-      confirmType="danger"
       @confirm="handleDeleteTask"
       @cancel="showDeleteConfirm = false"
     />

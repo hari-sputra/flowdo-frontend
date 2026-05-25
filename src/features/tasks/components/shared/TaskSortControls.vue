@@ -10,6 +10,7 @@ const emit = defineEmits<{
 }>()
 
 const sortOptions: { label: string; field: TaskSortField }[] = [
+  { label: 'Status', field: 'status' },
   { label: 'Due Date', field: 'dueDate' },
   { label: 'Priority', field: 'priority' },
   { label: 'Title', field: 'title' }
@@ -23,7 +24,7 @@ const sortOptions: { label: string; field: TaskSortField }[] = [
       v-for="option in sortOptions"
       :key="option.field"
       @click="emit('toggle-sort', option.field)"
-      class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
+      class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap cursor-pointer"
       :class="[
         sortState.field === option.field 
           ? 'bg-accent/10 text-accent dark:bg-accent/20' 

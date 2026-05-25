@@ -31,6 +31,7 @@ const taskIsOverdue = computed(() => {
 })
 
 const isDone = computed(() => props.task.status === 'done')
+const isInProgress = computed(() => props.task.status === 'in-progress')
 </script>
 
 <template>
@@ -38,29 +39,34 @@ const isDone = computed(() => props.task.status === 'done')
     class="card-elevated p-4 flex flex-col gap-3 group transition-all duration-300 relative"
     :class="{ 
       'opacity-60': isDone,
-      'border-danger/50 ring-1 ring-danger/20': taskIsOverdue && !isDone
+      'border-danger/50 ring-1 ring-danger/20': taskIsOverdue && !isDone,
+      'border-accent/40 ring-1 ring-accent/10': isInProgress
     }"
   >
     <div class="flex items-start gap-3">
       <!-- Checkbox toggle -->
       <button
         @click.stop="toggleStatus"
-        class="mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors focus:outline-none"
+        class="mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200 focus:outline-none cursor-pointer"
         :class="[
           isDone
             ? 'bg-accent border-accent text-white'
-            : 'border-text-secondary/40 hover:border-accent hover:bg-accent/10'
+            : isInProgress
+              ? 'border-accent bg-accent/10 shadow-[0_0_8px_rgba(var(--color-accent),0.4)]'
+              : 'border-text-secondary/40 hover:border-accent hover:bg-accent/10'
         ]"
+        :title="isDone ? 'Mark as To-Do' : isInProgress ? 'Mark as Done' : 'Mark as In Progress'"
       >
         <svg v-if="isDone" class="w-3.5 h-3.5 fill-none stroke-current stroke-3" viewBox="0 0 24 24">
           <polyline points="20 6 9 17 4 12" />
         </svg>
+        <div v-else-if="isInProgress" class="w-2.5 h-2.5 bg-accent rounded-full animate-pulse"></div>
       </button>
 
       <!-- Content -->
-      <div class="flex-1 min-w-0" @click="editTask">
+      <div class="flex-1 min-w-0">
         <h3
-          class="font-semibold text-text-primary truncate transition-all cursor-pointer hover:text-accent"
+          class="font-semibold text-text-primary truncate transition-all"
           :class="{ 'line-through text-text-secondary': isDone }"
         >
           {{ task.title }}
@@ -73,24 +79,29 @@ const isDone = computed(() => props.task.status === 'done')
           {{ task.description }}
         </p>
 
-        <!-- Metadata Row -->
-        <div class="flex flex-wrap items-center gap-2 mt-3 text-xs">
+        <!-- Priority & Status Row -->
+        <div class="flex items-center gap-1.5 mt-3 text-xs overflow-hidden shrink-0">
           <TaskPriorityBadge :priority="task.priority" />
-          
-          <div
-            class="flex items-center gap-1 font-medium"
-            :class="[
-              taskIsOverdue ? 'text-danger' : 'text-text-secondary',
-              isDone ? 'opacity-70 line-through' : ''
-            ]"
-          >
-            <svg class="w-3.5 h-3.5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            {{ formatRelativeDate(task.dueDate) }}
-            <span v-if="taskIsOverdue" class="ml-1 text-[10px] uppercase font-bold bg-danger/10 px-1.5 py-0.5 rounded text-danger">Overdue</span>
-          </div>
+          <span class="text-[10px] font-bold uppercase tracking-wider" 
+                :class="isDone ? 'text-accent' : isInProgress ? 'text-accent' : 'text-text-secondary/70'">
+            • {{ isDone ? 'Done' : isInProgress ? 'In Progress' : 'To-Do' }}
+          </span>
+        </div>
+        
+        <!-- Date Row -->
+        <div
+          class="flex items-center gap-1 mt-2 text-xs font-medium truncate"
+          :class="[
+            taskIsOverdue ? 'text-danger' : 'text-text-secondary',
+            isDone ? 'opacity-70 line-through' : ''
+          ]"
+        >
+          <svg class="w-3.5 h-3.5 stroke-current stroke-2 fill-none shrink-0" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span class="truncate">{{ formatRelativeDate(task.dueDate) }}</span>
+          <span v-if="taskIsOverdue" class="ml-1 text-[10px] uppercase font-bold bg-danger/10 px-1.5 py-0.5 rounded text-danger shrink-0">Overdue</span>
         </div>
 
         <!-- Tags Row -->
@@ -110,7 +121,7 @@ const isDone = computed(() => props.task.status === 'done')
       <div class="flex flex-col items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
         <button
           @click.stop="editTask"
-          class="p-1.5 text-text-secondary hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
+          class="p-1.5 text-text-secondary hover:text-accent hover:bg-accent/10 rounded-lg transition-colors cursor-pointer"
           title="Edit Task"
         >
           <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -120,7 +131,7 @@ const isDone = computed(() => props.task.status === 'done')
         </button>
         <button
           @click.stop="emit('delete', task.id)"
-          class="p-1.5 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+          class="p-1.5 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-colors cursor-pointer"
           title="Delete Task"
         >
           <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
