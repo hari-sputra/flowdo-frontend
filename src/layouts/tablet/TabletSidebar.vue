@@ -54,7 +54,7 @@ const handleLogout = async () => {
       <!-- Collapse toggle button -->
       <button
         @click="emit('toggle')"
-        class="p-1.5 rounded border border-border bg-surface-elevated hover:bg-border/30 dark:hover:bg-border/10 text-text-secondary hover:text-text-primary transition-all duration-200"
+        class="p-1.5 rounded border cursor-pointer border-border bg-surface-elevated hover:bg-border/30 dark:hover:bg-border/10 text-text-secondary hover:text-text-primary transition-all duration-200"
         :aria-label="props.collapsed ? 'Expand menu' : 'Collapse menu'"
       >
         <svg v-if="props.collapsed" class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">

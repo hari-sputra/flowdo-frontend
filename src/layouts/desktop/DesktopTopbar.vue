@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTheme } from '@/composables/useTheme'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTaskStore } from '@/stores/task.store'
+import { onClickOutside } from '@vueuse/core'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +21,13 @@ const pageTitle = computed(() => {
 })
 
 const userDropdownOpen = ref(false)
+const userDropdownRef = ref<HTMLElement | null>(null)
+
+onClickOutside(userDropdownRef, () => {
+  if (userDropdownOpen.value) {
+    userDropdownOpen.value = false
+  }
+})
 
 const handleLogout = () => {
   authStore.logout()
@@ -43,7 +51,7 @@ const handleLogout = () => {
       <!-- Theme Switcher -->
       <button
         @click="setTheme(isDark ? 'light' : 'dark')"
-        class="p-2 text-text-secondary hover:text-text-primary rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors"
+        class="p-2 text-text-secondary hover:text-text-primary rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors cursor-pointer"
         :aria-label="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
       >
         <svg v-if="isDark" class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -58,7 +66,7 @@ const handleLogout = () => {
       <!-- Notification Bell with Red Badge -->
       <div class="relative">
         <button
-          class="p-2 text-text-secondary hover:text-text-primary rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors relative"
+          class="p-2 text-text-secondary hover:text-text-primary rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors relative cursor-pointer"
           aria-label="Notifications"
         >
           <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -79,10 +87,10 @@ const handleLogout = () => {
       <div class="h-6 w-px bg-border"></div>
 
       <!-- User Profile trigger -->
-      <div class="relative">
+      <div class="relative" ref="userDropdownRef">
         <button
           @click="userDropdownOpen = !userDropdownOpen"
-          class="flex items-center gap-2 group p-1 pr-2 rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors"
+          class="flex items-center gap-2 group p-1 pr-2 rounded-full hover:bg-border/30 dark:hover:bg-border/10 transition-colors cursor-pointer"
         >
           <span class="w-8 h-8 rounded-full bg-accent/10 dark:bg-accent/20 border border-border text-accent flex items-center justify-center font-mono font-bold text-sm">
             {{ authStore.userInitials }}
@@ -98,7 +106,6 @@ const handleLogout = () => {
         <!-- Dropdown Menu -->
         <div
           v-if="userDropdownOpen"
-          v-on-click-outside="() => userDropdownOpen = false"
           class="absolute right-0 mt-2 w-48 bg-surface-elevated paper-border paper-shadow rounded-md py-1 z-30 transition-all text-sm"
         >
           <RouterLink

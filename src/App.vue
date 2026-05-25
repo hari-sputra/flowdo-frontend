@@ -8,9 +8,9 @@ const { isDark } = useTheme()
 
 <template>
   <!-- Main entry point: Layout structures are resolved inside routing views -->
-  <RouterView v-slot="{ Component }">
+  <RouterView v-slot="{ Component, route }">
     <transition name="page-fade" mode="out-in">
-      <component :is="Component" />
+      <component :is="Component" :key="route.path" />
     </transition>
   </RouterView>
   

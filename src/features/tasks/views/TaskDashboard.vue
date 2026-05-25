@@ -29,6 +29,7 @@ const searchQuery = ref("");
 const selectedPriority = ref<"all" | "low" | "medium" | "high" | "urgent">(
   "all",
 );
+const showPriorities = ref(true);
 
 const filteredTasks = computed(() => {
   return taskStore.sortedTasks.filter((t) => {
@@ -100,7 +101,7 @@ const executeDelete = () => {
       <!-- Decorative background glow -->
       <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-white/10 blur-xl"></div>
 
-      <div class="space-y-4 relative z-10">
+      <div v-if="taskStore.tasks.length > 0" class="space-y-4 relative z-10">
         <div>
           <h3 class="text-sm font-semibold opacity-90">Daily Task Progress</h3>
           <p class="text-2xl font-bold mt-1">
@@ -116,6 +117,27 @@ const executeDelete = () => {
           <div class="bg-white h-full rounded-full transition-all duration-500"
             :style="{ width: `${taskStore.dailyProgress}%` }"></div>
         </div>
+      </div>
+
+      <!-- Empty state when no tasks exist at all -->
+      <div v-else class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+        <div>
+          <h3 class="text-sm font-semibold opacity-90">Welcome to FlowDo!</h3>
+          <p class="text-xl font-bold mt-1">
+            Ready to get organized?
+          </p>
+          <p class="text-xs opacity-75 mt-0.5">
+            You don't have any tasks yet. Create one to get started!
+          </p>
+        </div>
+        
+        <RouterLink to="/tasks/new" class="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-accent hover:bg-white/90 font-bold py-2.5 px-5 rounded-xl transition-all duration-200 cursor-pointer shadow-sm">
+          <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          New Task
+        </RouterLink>
       </div>
     </div>
 
@@ -168,9 +190,17 @@ const executeDelete = () => {
 
     <!-- 3. Task Priority groups progress grid -->
     <div class="space-y-3">
-      <h3 class="text-sm font-bold text-text-primary">Task Priorities</h3>
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-text-primary">Task Priorities</h3>
+        <button @click="showPriorities = !showPriorities" class="text-xs font-semibold text-text-secondary hover:text-accent transition-colors flex items-center gap-1 cursor-pointer">
+          {{ showPriorities ? 'Hide' : 'Show' }}
+          <svg class="w-4 h-4 transition-transform duration-200 stroke-2" :class="{'rotate-180': showPriorities}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <div v-show="showPriorities" class="grid grid-cols-2 gap-4">
         <!-- Urgent -->
         <div @click="
           selectedPriority = selectedPriority === 'urgent' ? 'all' : 'urgent'
@@ -260,6 +290,8 @@ const executeDelete = () => {
       </div>
     </div>
 
+    <hr class="border-border border"/>
+
     <!-- 4. Dynamic Tasks List showing filtered selections -->
     <div class="space-y-4 pt-2">
       <div class="flex items-center justify-between flex-wrap gap-4">
@@ -273,7 +305,7 @@ const executeDelete = () => {
         <!-- Search bar input -->
         <div class="relative w-full sm:w-44">
           <input v-model="searchQuery" type="text" placeholder="Search..."
-            class="w-full bg-surface border border-border text-xs rounded-full py-1.5 pl-7 pr-3 focus:outline-none focus:border-accent transition-colors" />
+            class="w-full bg-surface border border-accent text-xs rounded-full py-1.5 pl-7 pr-3 focus:outline-none focus:border-accent transition-colors" />
           <svg class="w-3.5 h-3.5 text-text-secondary absolute left-2.5 top-2.5 fill-none stroke-current"
             viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8" />

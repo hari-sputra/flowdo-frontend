@@ -30,7 +30,9 @@ export function useDueDateAlert(tasks: Ref<Task[]>) {
         action: {
           label: 'View',
           onClick: () => {
-            // Optional: navigate to today's tasks
+            import('@/router').then(({ default: router }) => {
+              router.push('/tasks/today')
+            })
           }
         }
       })
